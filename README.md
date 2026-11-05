@@ -1,6 +1,6 @@
 # Electron + React + SQLite Starter Template
 
-A reusable desktop-application scaffold with the same architecture as ChessSync. Use this to bootstrap new Electron desktop apps quickly.
+A reusable desktop-application scaffold. Use this to bootstrap new Electron desktop apps quickly.
 
 ## Tech Stack
 
