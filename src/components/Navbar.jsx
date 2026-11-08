@@ -12,6 +12,7 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 flex items-center h-14 gap-2">
         <span className="font-bold text-lg mr-4">StarterApp</span>
         <NavLink to="/" className={linkClass}>Home</NavLink>
+        <NavLink to="/chat" className={linkClass}>Chat</NavLink>
         <NavLink to="/settings" className={linkClass}>Settings</NavLink>
       </div>
     </nav>
