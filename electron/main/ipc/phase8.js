@@ -57,7 +57,7 @@ function registerPhase8IpcHandlers(mainWindow, settingsService) {
     ipcMain.handle('tray:create', (event, { trayMode = true }) => {
         const quitCallback = async () => {
             if (settingsServiceRef) {
-                await settingsServiceRef.set('trayMode', false);
+                await settingsServiceRef.setSetting('trayMode', false);
             }
             app.quit();
         };

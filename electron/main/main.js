@@ -72,7 +72,7 @@ async function initializeServices() {
     ensureAboutMe();
 
     // Get API configuration from settings
-    const settings = await settingsService.getSettings();
+    const settings = await settingsService.get();
     apiClient = getApiClient({
         timeout: settings.apiTimeout || 30000,
         userAgent: 'StarterApp/1.0',
@@ -177,7 +177,7 @@ app.whenReady().then(async () => {
         createTray(mainWindow, {
             trayMode: true,
             quitCallback: async () => {
-                await services.settingsService.set('trayMode', false);
+                await services.settingsService.setSetting('trayMode', false);
                 app.quit();
             },
         });
@@ -185,7 +185,7 @@ app.whenReady().then(async () => {
         // Warm up Ollama on launch
         (async () => {
             try {
-                const settings = await services.settingsService.getSettings();
+                const settings = await services.settingsService.get();
                 const model = settings.defaultModel || 'llama3.2';
                 const result = await warmUpOllama(model);
                 if (!result.success) {

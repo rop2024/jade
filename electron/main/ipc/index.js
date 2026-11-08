@@ -29,7 +29,7 @@ function registerIpcHandlers(ipcMain, {
     // ============================================
     // Settings Handlers
     // ============================================
-    ipcMain.handle('settings:get', async () => settingsService.getSettings());
+    ipcMain.handle('settings:get', async () => settingsService.get());
     ipcMain.handle('settings:update', async (event, settings) => settingsService.setAll(settings));
     ipcMain.handle('settings:reset', async () => settingsService.reset());
 
