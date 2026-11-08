@@ -95,28 +95,28 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
     };
 
     return (
-        <div className="bg-[#16213e] border border-gray-700 rounded-xl p-6 space-y-5">
+        <div className="surface-2 border border-line rounded panel p-6 space-y-5 shadow-neon-cyan">
             <div className="flex justify-between items-start">
-                <h3 className="text-lg font-bold">{mode ? 'Edit Mode' : 'New Mode'}</h3>
+                <h3 className="text-lg font-display font-bold text-text">{mode ? 'Edit Mode' : 'New Mode'}</h3>
                 <div className="flex gap-2">
                     {mode && (
                         <button
                             onClick={handleDelete}
-                            className="px-3 py-1.5 text-xs text-red-400 hover:bg-red-900/20 rounded hover:text-red-300"
+                            className="px-3 py-1.5 text-xs text-pink hover:bg-pink/10 rounded hover:text-pink transition-colors"
                         >
                             Delete
                         </button>
                     )}
                     <button
                         onClick={handleCancel}
-                        className="px-3 py-1.5 text-xs text-gray-400 hover:bg-gray-700/50 rounded hover:text-white"
+                        className="px-3 py-1.5 text-xs text-dim hover:text-text hover:bg-surface-3 rounded transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="px-4 py-1.5 text-xs bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 text-white"
+                        className="px-4 py-1.5 text-xs bg-yellow text-black font-technical font-bold disabled:opacity-50 hover:bg-surface-3 hover:border-yellow hover:border transition-colors"
                     >
                         {saving ? 'Saving…' : 'Save Mode'}
                     </button>
@@ -126,43 +126,43 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
             <form onSubmit={handleSave} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Id</label>
+                        <label className="tech-label text-muted mb-1 block">// id</label>
                         <input
                             value={draft.id}
                             onChange={(e) => updateField('id', e.target.value)}
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                             placeholder="journal-digest"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Name</label>
+                        <label className="tech-label text-muted mb-1 block">// name</label>
                         <input
                             value={draft.name}
                             onChange={(e) => updateField('name', e.target.value)}
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                             placeholder="Journal Digest"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Slash command</label>
+                        <label className="tech-label text-muted mb-1 block">// slash command</label>
                         <input
                             value={draft.slash}
                             onChange={(e) => updateField('slash', e.target.value)}
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                             placeholder="/journal"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Model</label>
+                        <label className="tech-label text-muted mb-1 block">// model</label>
                         <input
                             value={draft.model}
                             onChange={(e) => updateField('model', e.target.value)}
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                             placeholder="llama3.2"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Temperature</label>
+                        <label className="tech-label text-muted mb-1 block">// temperature</label>
                         <input
                             type="number"
                             step="0.1"
@@ -170,17 +170,17 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
                             max="2"
                             value={draft.temperature}
                             onChange={(e) => updateField('temperature', parseFloat(e.target.value) || 0.5)}
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Output type</label>
+                        <label className="tech-label text-muted mb-1 block">// output type</label>
                         <select
                             value={draft.output?.type || 'markdown'}
                             onChange={(e) =>
                                 updateField('output', { ...draft.output, type: e.target.value })
                             }
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                         >
                             <option value="markdown">Markdown</option>
                             <option value="text">Plain text</option>
@@ -189,42 +189,42 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">System prompt</label>
+                    <label className="tech-label text-muted mb-1 block">// system prompt</label>
                     <textarea
                         value={draft.system}
                         onChange={(e) => updateField('system', e.target.value)}
                         rows={4}
-                        className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                         placeholder="You are a helpful assistant…"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Output template</label>
+                    <label className="tech-label text-muted mb-1 block">// output template</label>
                     <textarea
                         value={draft.template}
                         onChange={(e) => updateField('template', e.target.value)}
                         rows={3}
-                        className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                         placeholder="# Summary…"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Rules</label>
+                    <label className="tech-label text-muted mb-1 block">// rules</label>
                     <div className="space-y-2">
                         {draft.rules.map((rule, index) => (
                             <div key={index} className="flex gap-2">
                                 <input
                                     value={rule}
                                     onChange={(e) => updateRule(index, e.target.value)}
-                                    className="flex-1 bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="flex-1 bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                                     placeholder="Bullets only"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => removeRule(index)}
-                                    className="px-2 py-2 text-gray-500 hover:text-red-400 rounded hover:bg-gray-700/50"
+                                    className="px-2 py-2 text-dim hover:text-pink rounded hover:bg-pink/10"
                                 >
                                     ×
                                 </button>
@@ -233,7 +233,7 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
                         <button
                             type="button"
                             onClick={addRule}
-                            className="text-xs text-blue-400 hover:text-blue-300"
+                            className="text-xs text-cyan hover:text-text"
                         >
                             + Add rule
                         </button>
@@ -241,27 +241,27 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Few-shot examples</label>
+                    <label className="tech-label text-muted mb-1 block">// few-shot examples</label>
                     <div className="space-y-2">
                         {draft.examples.map((example, index) => (
-                            <div key={index} className="space-y-2 border-b border-gray-800 pb-2">
+                            <div key={index} className="space-y-2 border-b border-line pb-2">
                                 <div className="flex gap-2">
                                     <input
                                         value={example.input}
                                         onChange={(e) => updateExample(index, 'input', e.target.value)}
-                                        className="flex-1 bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        className="flex-1 bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                                         placeholder="Input"
                                     />
                                     <input
                                         value={example.output}
                                         onChange={(e) => updateExample(index, 'output', e.target.value)}
-                                        className="flex-1 bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        className="flex-1 bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                                         placeholder="Output"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => removeExample(index)}
-                                        className="px-2 py-2 text-gray-500 hover:text-red-400 rounded hover:bg-gray-700/50"
+                                        className="px-2 py-2 text-dim hover:text-pink rounded hover:bg-pink/10"
                                     >
                                         ×
                                     </button>
@@ -271,7 +271,7 @@ export function ModeEditor({ mode, onSave, onDelete, onCancel }) {
                         <button
                             type="button"
                             onClick={addExample}
-                            className="text-xs text-blue-400 hover:text-blue-300"
+                            className="text-xs text-cyan hover:text-text"
                         >
                             + Add example
                         </button>

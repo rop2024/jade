@@ -60,32 +60,32 @@ export function ModeTestPanel({ mode }) {
     }, [sampleInput, mode, aboutMe, loadAboutMeStore]);
 
     return (
-        <div className="bg-[#16213e] border border-gray-700 rounded-xl p-6 space-y-4">
-            <h3 className="text-lg font-bold">Test Mode</h3>
-            <p className="text-sm text-gray-400">
+        <div className="surface-2 border border-line rounded panel p-6 space-y-4 shadow-neon-cyan">
+            <h3 className="text-lg font-display font-bold text-text">Test Mode</h3>
+            <p className="text-sm text-dim">
                 Send sample input through this mode and inspect the output.
             </p>
             <div className="space-y-3">
-                <label className="block text-xs font-medium text-gray-400">Sample input</label>
+                <label className="tech-label text-dim mb-1 block">// sample input</label>
                 <textarea
                     value={sampleInput}
                     onChange={(e) => setSampleInput(e.target.value)}
                     rows={3}
-                    className="w-full bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full bg-surface-3 border border-line rounded px-3 py-2 text-text focus-ring font-mono text-sm"
                     placeholder="e.g. Process my journal entry from today…"
                 />
                 <button
                     onClick={handleTest}
                     disabled={testing || !sampleInput.trim() || !mode}
-                    className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-sm font-medium text-white"
+                    className="px-4 py-2 rounded bg-cyan text-black font-technical font-bold disabled:opacity-50 hover:bg-surface-3 hover:border-cyan hover:border transition-colors"
                 >
                     {testing ? 'Testing…' : 'Test'}
                 </button>
             </div>
             {output && (
                 <div className="space-y-2">
-                    <label className="block text-xs font-medium text-gray-400">Output</label>
-                    <div className="bg-[#0b1020] border border-gray-700 rounded p-4 text-sm text-gray-200 max-h-[400px] overflow-y-auto font-mono">
+                    <label className="tech-label text-dim mb-1 block">// output</label>
+                    <div className="bg-[#080A0F] border border-line rounded p-4 text-sm text-text max-h-[400px] overflow-y-auto font-mono">
                         {output}
                     </div>
                 </div>

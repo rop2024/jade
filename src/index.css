@@ -2,10 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
 html, body, #root {
   height: 100%;
   margin: 0;
-  background: #0b1020;
-  color: #fff;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #080A0F;
+  color: #F2F5F7;
+  font-family: 'Rajdhani', 'Bahnschrift', 'Arial Narrow', sans-serif;
 }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #293244 #080A0F;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #080A0F;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #293244;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #00E5FF;
+}
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus {
+  outline: 2px solid #00E5FF;
+  outline-offset: 3px;
+}
+
+.panel {
+  background: #141925;
+  border: 1px solid #293244;
+  border-bottom-right-radius: 14px;
+}
+
+.tech-label {
+  @apply text-tech font-technical text-xs uppercase tracking-wider;
+}
+
+.neon-cyan {
+  color: #00E5FF;
+}
+
+.neon-yellow {
+  color: #FCEE09;
+}
+
+.neon-green {
+  color: #5DFF6A;
+}
+
+.neon-magenta {
+  color: #C44DFF;
+}
+
+.neon-pink {
+  color: #FF3B7A;
+}
+
+.neon-orange {
+  color: #FF9F43;
+}
+
+.bg-surface-1 { background-color: #0E1119; }
+.bg-surface-2 { background-color: #141925; }
+.bg-surface-3 { background-color: #1B2230; }
+.border-line { border-color: #293244; }
+
+.text-dim { color: #566173; }
+.text-muted { color: #8D98A8; }

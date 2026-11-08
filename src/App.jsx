@@ -8,7 +8,7 @@ import { ChatPage } from './pages/ChatPage';
 function App() {
   return (
     <HashRouter>
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#23324f,_#0b1020_58%)] text-white">
+      <div className="min-h-screen bg-[#080A0F] text-text">
         <Navbar />
         <main className="mx-auto max-w-7xl px-4 py-8">
           <Routes>

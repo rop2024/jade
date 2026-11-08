@@ -10,7 +10,7 @@ export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveTo
       <button
         onClick={() => onCopy(message.content)}
         title="Copy message"
-        className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+        className="p-1.5 text-muted hover:text-cyan hover:bg-surface-3 rounded transition-colors"
       >
         <span aria-hidden="true">&#128203;</span>
       </button>
@@ -19,14 +19,14 @@ export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveTo
           <button
             onClick={() => onRegenerate(message.id)}
             title="Regenerate response"
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            className="p-1.5 text-muted hover:text-cyan hover:bg-surface-3 rounded transition-colors"
           >
             <span aria-hidden="true">&#x267B;</span>
           </button>
           <button
             onClick={() => onSaveToVault(message.id)}
             title="Save to Vault"
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            className="p-1.5 text-muted hover:text-cyan hover:bg-surface-3 rounded transition-colors"
           >
             <span aria-hidden="true">&#128207;</span>
           </button>
@@ -37,7 +37,7 @@ export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveTo
               setTimeout(() => setFeedbackSaved(false), 1500);
             }}
             title="Good response"
-            className={`p-1.5 rounded transition-colors ${feedbackSaved ? 'text-green-400 bg-green-900/30' : 'text-gray-400 hover:text-green-400 hover:bg-gray-700'}`}
+            className={`p-1.5 rounded transition-colors ${feedbackSaved ? 'text-green bg-green/10' : 'text-muted hover:text-green hover:bg-surface-3'}`}
           >
             <span aria-hidden="true">👍</span>
           </button>
@@ -47,7 +47,7 @@ export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveTo
         <button
           onClick={() => onEdit(message.id)}
           title="Edit message"
-          className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+          className="p-1.5 text-muted hover:text-cyan hover:bg-surface-3 rounded transition-colors"
         >
           <span aria-hidden="true">&#9998;</span>
         </button>

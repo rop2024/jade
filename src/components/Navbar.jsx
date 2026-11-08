@@ -3,14 +3,18 @@ import { NavLink } from 'react-router-dom';
 
 export function Navbar() {
   const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-      isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-[#16213e]'
+    `px-3 py-2 rounded text-sm font-technical transition-colors border-b-2 border-transparent ${
+      isActive
+        ? 'border-yellow text-yellow'
+        : 'border-transparent text-muted hover:border-line hover:text-text'
     }`;
 
   return (
-    <nav className="bg-[#16213e] border-b border-gray-700">
+    <nav className="bg-surface-1 border-b border-line">
       <div className="mx-auto max-w-7xl px-4 flex items-center h-14 gap-2">
-        <span className="font-bold text-lg mr-4">StarterApp</span>
+        <span className="font-display font-bold text-lg tracking-wider flex items-center gap-2">
+          <span className="text-cyan">JADE</span>
+        </span>
         <NavLink to="/" className={linkClass}>Home</NavLink>
         <NavLink to="/chat" className={linkClass}>Chat</NavLink>
         <NavLink to="/settings" className={linkClass}>Settings</NavLink>

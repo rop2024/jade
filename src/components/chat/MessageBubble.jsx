@@ -13,14 +13,14 @@ export function MessageBubble({ message, onCopy, onRegenerate, onEdit, onSaveToV
       } mb-4 group`}
     >
       <div
-        className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed relative ${
+        className={`max-w-[85%] px-4 py-3 rounded panel relative text-text text-sm leading-relaxed font-mono ${
           isUser
-            ? 'bg-blue-600 text-white rounded-tr-none'
-            : 'bg-[#1a1a2e] border border-gray-700 text-gray-200 rounded-tl-none'
+            ? 'border border-cyan/30 bg-surface-3 border-l-4 border-l-yellow rounded-tr-none'
+            : 'border border-line surface-2 rounded-tl-none'
         }`}
       >
         {isAssistant ? (
-          <ReactMarkdown className="prose prose-sm text-gray-200" children={message.content} />
+          <ReactMarkdown className="prose prose-sm text-text" children={message.content} />
         ) : (
           message.content
         )}

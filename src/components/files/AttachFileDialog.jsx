@@ -71,12 +71,12 @@ export function AttachFileDialog({ open, onClose, onAttach }) {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
-            <div className="bg-[#16213e] border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="surface-2 border border-line rounded panel p-6 w-full max-w-md shadow-neon-cyan">
                 <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-bold">Attach File</h3>
+                    <h3 className="text-lg font-display font-bold text-text">Attach File</h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-white"
+                        className="text-dim hover:text-cyan"
                     >
                         &times;
                     </button>
@@ -84,10 +84,9 @@ export function AttachFileDialog({ open, onClose, onAttach }) {
 
                 <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="cursor-pointer border-2 border-dashed border-gray-600 rounded-lg p-8 text-center transition-colors hover:bg-[#1a1a2e] hover:border-blue-500"
-                    className={dragging ? 'bg-[#1a1a2e] border-blue-500' : ''}
+                    className="cursor-pointer border-2 border-dashed border-line rounded-lg p-8 text-center transition-colors hover:bg-surface-3 hover:border-cyan"
                 >
-                    <p className="text-sm text-gray-400 mb-2">Drag & drop files here, or</p>
+                    <p className="text-sm text-dim mb-2">Drag & drop files here, or</p>
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -98,34 +97,34 @@ export function AttachFileDialog({ open, onClose, onAttach }) {
                     />
                     <button
                         type="button"
-                        className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                        className="text-xs bg-cyan text-black font-technical font-bold px-3 py-1 rounded hover:bg-surface-3 transition-colors"
                     >
                         Browse files
                     </button>
-                    <p className="text-[10px] text-gray-500 mt-3">
+                    <p className="text-[10px] text-dim mt-3">
                         Supported: .txt, .md, .pdf, .docx
                     </p>
                 </div>
 
                 {attachments.length > 0 && (
                     <div className="mt-4 space-y-2">
-                        <p className="text-xs font-medium text-gray-400">Attached files:</p>
+                        <p className="tech-label text-dim mb-2 block">// attached files</p>
                         {attachments.map((a) => (
                             <div
                                 key={a.id}
-                                className="flex items-center justify-between bg-[#1a1a2e] border border-gray-700 rounded px-3 py-2"
+                                className="flex items-center justify-between surface-3 border border-line rounded px-3 py-2"
                             >
-                                <span className="text-sm truncate" title={a.filename}>
+                                <span className="text-sm truncate text-text" title={a.filename}>
                                     {a.filename}
                                 </span>
-                                <span className="text-[10px] text-gray-500">
+                                <span className="text-[10px] text-dim">
                                     {a.wordCount} words
                                 </span>
                                 <button
                                     onClick={() => {
                                         useConversationStore.getState().removeAttachment(a.id);
                                     }}
-                                    className="text-gray-500 hover:text-red-400"
+                                    className="text-dim hover:text-pink"
                                 >
                                     ×
                                 </button>
@@ -134,17 +133,17 @@ export function AttachFileDialog({ open, onClose, onAttach }) {
                     </div>
                 )}
 
-                <div className="flex justify-end gap-2 pt-4 border-t border-gray-700">
+                <div className="flex justify-end gap-2 pt-4 border-t border-line">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded text-gray-300 hover:text-white"
+                        className="px-4 py-2 rounded text-dim hover:text-text"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={() => onAttach?.()}
                         disabled={attachments.length === 0 || processing}
-                        className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white"
+                        className="px-4 py-2 rounded bg-yellow text-black font-technical font-bold disabled:opacity-50 transition-colors"
                     >
                         {processing ? 'Attaching…' : 'Attach'}
                     </button>

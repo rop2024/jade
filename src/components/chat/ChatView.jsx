@@ -368,7 +368,7 @@ export function ChatView() {
         }
         try {
             await addFeedbackExample(activeModeId, {
-                input: '', // We don't have the input here easily; could store it
+                input: '',
                 output: content,
                 correctedOutput: content,
             });
@@ -461,15 +461,15 @@ export function ChatView() {
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
-                <div className="bg-red-900/30 border border-red-700 rounded-xl px-6 py-4 text-red-300 text-sm max-w-md">
-                    {error}
+                <div className="bg-pink/10 border border-pink/30 rounded panel p-6 max-w-md">
+                    <p className="text-pink text-sm font-mono mb-4">{error}</p>
+                    <button
+                        onClick={() => setError(null)}
+                        className="px-4 py-2 rounded text-cyan hover:text-text underline"
+                    >
+                        Dismiss
+                    </button>
                 </div>
-                <button
-                    onClick={() => setError(null)}
-                    className="mt-4 text-sm text-blue-400 underline"
-                >
-                    Dismiss
-                </button>
             </div>
         );
     }
@@ -477,7 +477,7 @@ export function ChatView() {
     return (
         <div className="flex flex-col h-full">
             {attachments.length > 0 && (
-                <div className="px-4 py-2 overflow-x-auto space-x-2 border-b border-gray-700 bg-[#0a0f1a]/50">
+                <div className="px-4 py-2 overflow-x-auto space-x-2 border-b border-line bg-surface-1">
                     {attachments.map((a) => (
                         <AttachmentChip
                             key={a.id}
@@ -487,7 +487,7 @@ export function ChatView() {
                     ))}
                     <button
                         onClick={clearAttachments}
-                        className="px-2 py-1 text-xs text-gray-500 hover:text-white rounded hover:bg-gray-700/50"
+                        className="px-2 py-1 text-tech text-xs text-muted hover:text-text rounded hover:bg-surface-3"
                     >
                         Clear all
                     </button>
@@ -500,46 +500,45 @@ export function ChatView() {
                     e.preventDefault();
                     const files = Array.from(e.dataTransfer.files || []);
                     setAttachDialog(true);
-                    // Store files for the dialog to process; re-open triggers import.
                     window.__pendingDropFiles = files;
                 }}
                 className="flex-1 min-w-0"
             >
                 <MessageList
-                messages={messages}
-                streaming={streaming}
-                onCopy={handleCopy}
-                onRegenerate={handleRegenerate}
-                onEdit={(id) => {
-                    const msg = messages.find((m) => m.id === id);
-                    setEditContent(msg?.content || '');
-                    setEditingId(id);
-                }}
-                onSaveToVault={handleSaveToVault}
-                sources={ragSources}
-                onFeedback={handleFeedback}
-            />
+                    messages={messages}
+                    streaming={streaming}
+                    onCopy={handleCopy}
+                    onRegenerate={handleRegenerate}
+                    onEdit={(id) => {
+                        const msg = messages.find((m) => m.id === id);
+                        setEditContent(msg?.content || '');
+                        setEditingId(id);
+                    }}
+                    onSaveToVault={handleSaveToVault}
+                    sources={ragSources}
+                    onFeedback={handleFeedback}
+                />
             </div>
             {editingId && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="bg-[#16213e] border border-gray-700 rounded-xl p-5 w-full max-w-md shadow-xl">
-                        <h3 className="text-white font-semibold mb-3">Edit message</h3>
+                    <div className="surface-2 border border-line rounded panel p-5 w-full max-w-md shadow-neon-cyan">
+                        <h3 className="text-text font-display font-bold mb-3">Edit message</h3>
                         <textarea
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
-                            className="w-full bg-[#1a1a2e] border border-gray-700 rounded p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none mb-3"
+                            className="w-full bg-surface-3 border border-line rounded p-3 text-text focus-ring font-mono text-sm mb-3"
                             rows={4}
                         />
                         <div className="flex justify-end gap-2">
                             <button
                                 onClick={handleEditCancel}
-                                className="px-4 py-2 rounded text-gray-300 hover:text-white"
+                                className="px-4 py-2 rounded text-muted hover:text-text"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={() => handleEditSave(editingId, editContent)}
-                                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+                                className="px-4 py-2 rounded bg-yellow text-black font-technical font-bold hover:bg-surface-3 transition-colors"
                             >
                                 Save & regenerate
                             </button>

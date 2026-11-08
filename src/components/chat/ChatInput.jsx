@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 export function ChatInput({ input, onChange, onSend, onStop, streaming, modes, activeModeId, onModeChange, onAttach }) {
     const textareaRef = useRef(null);
@@ -50,22 +50,22 @@ export function ChatInput({ input, onChange, onSend, onStop, streaming, modes, a
     const activeMode = modes.find((m) => m.id === activeModeId);
 
     return (
-        <div className="px-4 pb-6 pt-4 border-t border-gray-700 bg-[#0b1020]">
+        <div className="px-4 pb-6 pt-4 border-t border-line bg-surface-1">
             <div className="flex gap-2 items-end">
                 <textarea
                     ref={textareaRef}
                     value={input}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type a message… (/ for modes, Enter to send, Shift + Enter for new line)"
-                    className="w-full bg-[#16213e] border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                    placeholder="// type a message… (/ for modes, Enter to send, Shift + Enter for new line)"
+                    className="w-full bg-surface-3 border border-line rounded px-4 py-3 text-text focus-ring font-mono text-sm resize-none"
                     rows={2}
                 />
                 <div className="flex gap-2">
                     <button
                         type="button"
                         onClick={onAttach}
-                        className="px-3 py-3 rounded-xl bg-[#1a1a2e] border border-gray-700 hover:bg-gray-700/50 text-gray-400 hover:text-white transition-colors"
+                        className="p-3 rounded bg-surface-3 border border-line text-muted hover:text-cyan hover:border-cyan transition-colors"
                         title="Attach file"
                     >
                         <span aria-hidden="true">📎</span>
@@ -73,7 +73,7 @@ export function ChatInput({ input, onChange, onSend, onStop, streaming, modes, a
                     <button
                         onClick={() => (streaming ? onStop() : onSend())}
                         disabled={!input.trim()}
-                        className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white"
+                        className="px-5 py-3 rounded bg-yellow text-black font-technical font-bold hover:bg-surface-3 hover:border-yellow hover:border disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                         {streaming ? 'Stop' : 'Send'}
                     </button>
@@ -81,24 +81,24 @@ export function ChatInput({ input, onChange, onSend, onStop, streaming, modes, a
             </div>
 
             {showSlash && slashMatches.length > 0 && (
-                <div className="absolute mt-1 w-[400px] bg-[#1a1a2e] border border-gray-700 rounded-lg shadow-xl z-10">
-                    <ul className="divide-y divide-gray-700">
+                <div className="absolute mt-1 w-[400px] surface-3 border border-line rounded-lg shadow-neon-cyan z-10">
+                    <ul className="divide-y divide-line">
                         {slashMatches.map((mode) => (
                             <li key={mode.id}>
                                 <button
                                     onClick={() => selectMode(mode)}
                                     className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                                         activeModeId === mode.id
-                                            ? 'bg-blue-600/30 text-blue-400'
-                                            : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                                            ? 'bg-cyan/10 text-cyan border-r-2 border-r-yellow'
+                                            : 'text-muted hover:bg-surface-3 hover:text-text'
                                     }`}
                                 >
-                                    <span className="text-blue-400 text-xs font-mono mr-2">
+                                    <span className="text-cyan text-xs font-mono mr-2">
                                         {mode.slash || `/${mode.id}`}
                                     </span>
                                     {mode.name}
                                     {activeModeId === mode.id && (
-                                        <span className="ml-auto text-[10px] text-gray-500">active</span>
+                                        <span className="ml-auto text-[10px] text-dim">active</span>
                                     )}
                                 </button>
                             </li>
@@ -108,8 +108,8 @@ export function ChatInput({ input, onChange, onSend, onStop, streaming, modes, a
             )}
 
             {activeMode && (
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <span className="text-blue-400">{activeMode.slash || `/${activeMode.id}`}</span>
+                <div className="flex items-center gap-2 text-tech text-dim">
+                    <span className="text-cyan">{activeMode.slash || `/${activeMode.id}`}</span>
                     <span>Mode: {activeMode.name}</span>
                 </div>
             )}

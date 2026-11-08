@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-starter",
+  "name": "jade",
   "version": "1.0.0",
-  "description": "Reusable Electron + React + SQLite (sql.js) desktop app starter template",
+  "description": "Jade — AI-powered desktop assistant for your Obsidian vault and local models",
   "main": "electron/main/main.js",
   "scripts": {
     "start": "electron .",
@@ -15,8 +15,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "build": {
-    "appId": "com.starter.app",
-    "productName": "LLMDesk",
+    "appId": "com.jade.app",
+    "productName": "Jade",
     "files": [
       "dist/**/*",
       "electron/**/*",

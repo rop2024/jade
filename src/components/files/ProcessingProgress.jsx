@@ -29,32 +29,32 @@ export function ProcessingProgress() {
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#16213e] border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="surface-2 border border-line rounded panel p-6 w-full max-w-md shadow-neon-cyan">
                 <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-bold">
+                    <h3 className="text-lg font-display font-bold text-text">
                         {type === 'batch' ? 'Batch Processing' : 'Processing Document'}
                     </h3>
                     <button
                         onClick={handleCancel}
-                        className="p-1 text-gray-500 hover:text-red-400 rounded hover:bg-red-900/20"
+                        className="p-1 text-dim hover:text-pink rounded hover:bg-pink/10"
                     >
                         &times;
                     </button>
                 </div>
 
-                <p className="text-sm text-gray-400 mb-4">
+                <p className="text-sm text-dim mb-4">
                     {message || stageLabels[stage] || 'Processing…'}
                 </p>
 
                 {total > 0 && (
                     <div className="space-y-2 mb-4">
-                        <div className="flex justify-between text-xs text-gray-400 mb-1">
+                        <div className="flex justify-between text-xs text-dim mb-1 font-mono">
                             <span>Part {part} of {total}</span>
                             <span>{pct}%</span>
                         </div>
-                        <div className="w-full bg-[#1a1a2e] border border-gray-700 rounded-full h-2">
+                        <div className="w-full bg-surface-3 border border-line rounded-full h-2 overflow-hidden">
                             <div
-                                className="bg-blue-600 h-2 rounded-full transition-all"
+                                className="bg-yellow h-2 rounded-none shadow-neon-yellow transition-all"
                                 style={{ width: `${pct}%` }}
                             />
                         </div>
@@ -62,10 +62,10 @@ export function ProcessingProgress() {
                 )}
 
                 {status === 'completed' && (
-                    <div className="text-xs text-green-400 mb-4">Completed.</div>
+                    <div className="text-xs text-green mb-4">Completed.</div>
                 )}
                 {status === 'error' && (
-                    <div className="text-xs text-red-400 mb-4">Error occurred.</div>
+                    <div className="text-xs text-pink mb-4">Error occurred.</div>
                 )}
 
                 <div className="flex justify-end">
@@ -73,7 +73,7 @@ export function ProcessingProgress() {
                         onClick={() => {
                             clearProcessing();
                         }}
-                        className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+                        className="px-4 py-2 rounded bg-cyan text-black font-technical font-bold hover:bg-surface-3 hover:border-cyan hover:border transition-colors"
                     >
                         {status === 'completed' || status === 'error' ? 'Close' : 'Cancel'}
                     </button>

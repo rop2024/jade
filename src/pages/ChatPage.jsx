@@ -72,7 +72,6 @@ export function ChatPage() {
         setModelOptions(options);
     }, [models, modelPresets]);
 
-    // Document processing progress subscriptions.
     useEffect(() => {
         const unsubProgress = onDocumentProgress((payload) => {
             setProcessing({
@@ -127,7 +126,6 @@ export function ChatPage() {
         };
     }, [setProcessing]);
 
-    // Batch processing progress subscriptions.
     useEffect(() => {
         const unsubProgress = onBatchProgress((payload) => {
             setProcessing({
@@ -170,7 +168,6 @@ export function ChatPage() {
         };
     }, [setProcessing]);
 
-    // RAG indexing progress subscriptions.
     useEffect(() => {
         const unsubProgress = onRAGProgress((payload) => {
             setProcessing({
@@ -269,7 +266,7 @@ export function ChatPage() {
     }, [activeConversationId, getMode, messages, contextBuildMessages, chatStart, onToken, onDone, onError, setError]);
 
     return (
-        <div className="min-h-screen bg-[#0b1020] text-white flex flex-col">
+        <div className="min-h-screen bg-[#080A0F] text-text flex flex-col">
             <div className="mx-auto max-w-[1400px] px-4 py-8 flex flex-col h-full">
                 <div className="flex flex-col lg:flex-row h-full gap-4">
                     <aside className="lg:w-80 flex flex-col">
@@ -278,7 +275,7 @@ export function ChatPage() {
                     <div className="flex-1 flex flex-col min-w-0">
                         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                             <div>
-                                <h1 className="text-2xl font-bold">
+                                <h1 className="text-3xl font-display font-bold tracking-tight">
                                     {activeConversationId ? 'Chat' : 'New Chat'}
                                 </h1>
                             </div>
@@ -287,27 +284,27 @@ export function ChatPage() {
                                 <button
                                     onClick={handleSummariseToNote}
                                     disabled={!activeConversationId || !messages.length}
-                                    className="px-3 py-2 text-xs bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 text-white"
+                                    className="px-3 py-2 text-xs font-technical bg-cyan text-black rounded hover:bg-surface-3 hover:border-cyan hover:border transition-colors"
                                 >
                                     Summarise to Note
                                 </button>
-                                <label className="flex items-center gap-1 text-xs text-gray-400 cursor-pointer">
+                                <label className="flex items-center gap-1 text-xs font-technical text-dim cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={useMyVault}
                                         onChange={(e) => setUseMyVault(e.target.checked)}
                                         disabled={!vaultConfigured}
-                                        className="rounded bg-[#1a1a2e] border border-gray-700 text-blue-600 focus:ring-blue-500"
+                                        className="rounded bg-surface-3 border border-line text-cyan focus-ring"
                                     />
                                     {vaultConfigured ? 'Use My Vault' : 'Vault not configured'}
                                 </label>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-400 uppercase tracking-wider">Model</span>
+                                <span className="tech-label text-dim">Model</span>
                                 <select
                                     value={selectedModelKey}
                                     onChange={(e) => setSelectedModelKey(e.target.value)}
-                                    className="bg-[#1a1a2e] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="bg-surface-3 border border-line rounded px-3 py-2 text-sm text-text focus-ring font-mono"
                                 >
                                     {modelOptions.map((o) => (
                                         <option key={o.value} value={o.value}>
@@ -317,7 +314,7 @@ export function ChatPage() {
                                 </select>
                             </div>
                         </div>
-                        <div className="flex-1 bg-[#16213e] rounded-xl border border-gray-700 flex flex-col overflow-hidden">
+                        <div className="flex-1 surface-2 border border-line rounded panel flex flex-col overflow-hidden shadow-neon-cyan">
                             <ChatView />
                         </div>
                     </div>

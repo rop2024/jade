@@ -41,7 +41,6 @@ export function Sidebar() {
     );
 
     const handleNewChat = async () => {
-        const now = new Date().toISOString();
         const conversation = await createConversation({
             title: 'New Conversation',
             model: null,
@@ -75,24 +74,24 @@ export function Sidebar() {
     };
 
     return (
-        <div className="w-80 bg-[#16213e] border-r border-gray-700 flex flex-col">
-            <div className="p-4 border-b border-gray-700">
-                <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Conversations</h2>
+        <div className="w-80 bg-surface-1 border-r border-line flex flex-col">
+            <div className="p-4 border-b border-line">
+                <h2 className="tech-label text-muted">// conversations</h2>
             </div>
 
-            <div className="p-3 border-b border-gray-700">
+            <div className="p-3 border-b border-line">
                 <div className="relative">
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search conversations…"
-                        className="w-full bg-[#1a1a2e] border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        placeholder="// search conversations"
+                        className="w-full bg-surface-3 border border-line rounded px-4 py-2.5 text-sm text-text placeholder-dim focus-ring font-mono"
                     />
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery('')}
-                            className="absolute right-2 top-2 text-gray-500 hover:text-white"
+                            className="absolute right-2 top-2 text-dim hover:text-cyan"
                         >
                             &times;
                         </button>
@@ -103,13 +102,13 @@ export function Sidebar() {
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
                 <button
                     onClick={handleNewChat}
-                    className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md shadow-blue-500/30"
+                    className="w-full px-4 py-2.5 text-sm font-technical text-text bg-cyan/10 border border-cyan/30 rounded hover:bg-cyan/20 transition-colors shadow-neon-cyan"
                 >
                     + New Chat
                 </button>
 
                 {filtered.length === 0 ? (
-                    <div className="px-4 py-4 text-center text-sm text-gray-500">
+                    <div className="px-4 py-4 text-center text-sm text-dim">
                         {searchQuery ? 'No matching conversations' : 'No conversations yet'}
                     </div>
                 ) : (
@@ -120,7 +119,7 @@ export function Sidebar() {
                             return (
                                 <li key={conversation.id}>
                                     {isRenaming ? (
-                                        <div className="flex items-center gap-2 bg-[#1a1a2e] rounded-lg p-1">
+                                        <div className="flex items-center gap-2 bg-surface-3 rounded-lg p-1">
                                             <input
                                                 autoFocus
                                                 value={renameTitle}
@@ -133,11 +132,11 @@ export function Sidebar() {
                                                         setRenameId(null);
                                                     }
                                                 }}
-                                                className="flex-1 bg-transparent px-2 py-1.5 text-sm text-white outline-none"
+                                                className="flex-1 bg-transparent px-2 py-1.5 text-sm text-text outline-none font-mono"
                                             />
                                             <button
                                                 onClick={() => handleRenameSave(conversation.id)}
-                                                className="p-1 text-blue-400 hover:text-blue-300 rounded hover:bg-blue-500/10"
+                                                className="p-1 text-cyan hover:text-text rounded hover:bg-surface-3"
                                             >
                                                 ✓
                                             </button>
@@ -146,7 +145,7 @@ export function Sidebar() {
                                                     setRenameTitle(conversation.title);
                                                     setRenameId(null);
                                                 }}
-                                                className="p-1 text-gray-500 hover:text-gray-300 rounded hover:bg-gray-700/50"
+                                                className="p-1 text-dim hover:text-pink rounded hover:bg-pink/10"
                                             >
                                                 ✕
                                             </button>
@@ -154,40 +153,19 @@ export function Sidebar() {
                                     ) : (
                                         <div
                                             onClick={() => handleSelect(conversation.id)}
-                                            onContextMenu={(e) => {
-                                                e.preventDefault();
-                                                // No-op context menu; delete via button below
-                                            }}
-                                            className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-sm transition-colors ${
+                                            className={`flex items-center gap-3 px-3 py-2 rounded cursor-pointer transition-colors border-l-2 ${
                                                 isActive
-                                                    ? 'bg-blue-600/20 text-white border-l-2 border-l-blue-500'
-                                                    : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                                                    ? 'border-l-yellow bg-cyan/10 text-cyan'
+                                                    : 'border-l-transparent text-muted hover:bg-surface-3 hover:text-text'
                                             }`}
+                                            title={conversation.title}
                                         >
-                                            <div className="flex-1 min-w-0 truncate">{conversation.title}</div>
-                                            <div className="text-xs text-gray-500 whitespace-nowrap">
+                                            <div className="flex-1 min-w-0 truncate text-text font-mono text-sm">
+                                                {conversation.title}
+                                            </div>
+                                            <div className="text-xs text-dim whitespace-nowrap font-mono">
                                                 {relativeTime(conversation.updated_at)}
                                             </div>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleRenameStart(conversation.id, conversation.title);
-                                                }}
-                                                className="p-1 text-gray-500 hover:text-blue-400 rounded hover:bg-gray-700/50 opacity-0 group-hover:opacity-100"
-                                                title="Rename"
-                                            >
-                                                ✎
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDelete(conversation.id);
-                                                }}
-                                                className="p-1 text-gray-500 hover:text-red-400 rounded hover:bg-gray-700/50 opacity-0 group-hover:opacity-100"
-                                                title="Delete"
-                                            >
-                                                ×
-                                            </button>
                                         </div>
                                     )}
                                 </li>

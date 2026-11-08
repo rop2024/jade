@@ -9,17 +9,17 @@ export function SourceLink({ path, heading, similarity }) {
     const headingLabel = heading ? ` › ${heading}` : '';
 
     return (
-        <div className="flex items-start gap-2 bg-[#1a1a2e] border border-gray-700 rounded-lg p-3 mb-2">
+        <div className="flex items-start gap-2 surface-3 border border-line rounded p-3 mb-2 border-l-2 border-l-cyan">
             <a
                 href={obsidianUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-medium text-blue-400 hover:text-blue-300 truncate"
+                className="text-xs font-technical text-cyan hover:text-text truncate"
                 title={path}
             >
                 {displayName}{headingLabel}
             </a>
-            <span className="text-[10px] text-gray-500 ml-auto">
+            <span className="text-[10px] text-dim ml-auto">
                 {Math.round((similarity || 0) * 100)}% match
             </span>
         </div>
@@ -30,10 +30,8 @@ export function SourcesPanel({ sources }) {
     if (!sources || sources.length === 0) return null;
 
     return (
-        <div className="mt-4 border-t border-gray-700 pt-4">
-            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Sources
-            </h4>
+        <div className="mt-4 border-t border-line pt-4">
+            <h4 className="tech-label text-muted mb-3">// sources</h4>
             <div className="space-y-2">
                 {sources.map((s, i) => (
                     <SourceLink
@@ -64,7 +62,7 @@ export function MessageList({ messages, streaming, onCopy, onRegenerate, onEdit,
       ))}
       {streaming && (
         <div className="flex justify-start mb-4">
-          <div className="px-4 py-3 bg-[#1a1a2e] border border-gray-700 text-gray-200 text-sm leading-relaxed rounded-tl-none">
+          <div className="px-4 py-3 surface-3 border border-line text-text text-sm leading-relaxed rounded-tl-none border-l-4 border-l-cyan">
             <StreamingIndicator />
           </div>
         </div>
