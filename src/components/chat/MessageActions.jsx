@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveToVault }) {
+export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveToVault, onFeedback }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
+  const [feedbackSaved, setFeedbackSaved] = useState(false);
 
   return (
     <div className="flex gap-1 opacity-0 group-hover:opacity-100">
@@ -28,6 +29,17 @@ export function MessageActions({ message, onCopy, onRegenerate, onEdit, onSaveTo
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
           >
             <span aria-hidden="true">&#128207;</span>
+          </button>
+          <button
+            onClick={() => {
+              onFeedback?.(message.id, message.content);
+              setFeedbackSaved(true);
+              setTimeout(() => setFeedbackSaved(false), 1500);
+            }}
+            title="Good response"
+            className={`p-1.5 rounded transition-colors ${feedbackSaved ? 'text-green-400 bg-green-900/30' : 'text-gray-400 hover:text-green-400 hover:bg-gray-700'}`}
+          >
+            <span aria-hidden="true">👍</span>
           </button>
         </>
       )}

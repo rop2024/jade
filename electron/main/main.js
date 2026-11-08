@@ -20,6 +20,10 @@ const { createEngine } = require('../../sync/engine');
 const { getDatabase } = require('./services/db');
 const { seedDefaultModes } = require('./services/modes');
 const { ensureAboutMe } = require('./services/context');
+const { warmUpOllama } = require('./services/OllamaWarmupService');
+const { registerGlobalHotkeys } = require('./services/QuickWindowService');
+const { createTray, destroyTray, getTray } = require('./services/TrayService');
+const { registerPhase8IpcHandlers } = require('./ipc/phase8');
 
 // IPC Handlers
 const registerIpcHandlers = require('./ipc');
@@ -163,6 +167,37 @@ app.whenReady().then(async () => {
             eventEmitter: services.eventEmitter,
         });
 
+        // Register Phase 8 IPC handlers (hotkeys, tray, startup, backup, lock)
+        registerPhase8IpcHandlers(mainWindow, services.settingsService);
+
+        // Register global hotkeys
+        registerGlobalHotkeys();
+
+        // Create system tray
+        createTray(mainWindow, {
+            trayMode: true,
+            quitCallback: async () => {
+                await services.settingsService.set('trayMode', false);
+                app.quit();
+            },
+        });
+
+        // Warm up Ollama on launch
+        (async () => {
+            try {
+                const settings = await services.settingsService.getSettings();
+                const model = settings.defaultModel || 'llama3.2';
+                const result = await warmUpOllama(model);
+                if (!result.success) {
+                    console.log('Ollama warm-up skipped:', result.error);
+                } else {
+                    console.log('Ollama warmed up successfully');
+                }
+            } catch (err) {
+                console.log('Ollama warm-up not available:', err.message);
+            }
+        })();
+
         // Create main window
         createWindow();
 
@@ -178,7 +213,13 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') app.quit();
+    if (process.platform !== 'darwin') {
+        // If tray mode is enabled, hide instead of quit
+        if (getTray && getTray()) {
+            return;
+        }
+        app.quit();
+    }
 });
 
 // ============================================

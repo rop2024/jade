@@ -53,6 +53,16 @@ CREATE TRIGGER IF NOT EXISTS messages_au AFTER UPDATE ON messages BEGIN
     INSERT INTO messages_fts(messages_fts, rowid, content) VALUES ('delete', old.rowid, old.content);
     INSERT INTO messages_fts(rowid, content) VALUES (new.rowid, new.content);
 END;
+
+CREATE TABLE IF NOT EXISTS chunks (
+    id TEXT PRIMARY KEY,
+    path TEXT,
+    heading TEXT,
+    text TEXT,
+    mtime INTEGER,
+    embedding BLOB
+);
+CREATE INDEX IF NOT EXISTS idx_chunks_path ON chunks(path);
 `;
 
 class ChatDatabase {

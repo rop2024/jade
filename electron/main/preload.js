@@ -145,6 +145,76 @@ contextBridge.exposeInMainWorld('api', {
         ipcRenderer.on('watch:detected', handler);
         return () => ipcRenderer.removeListener('watch:detected', handler);
     },
+
+    // ============================================
+    // RAG (vault search + retrieval-augmented generation)
+    // ============================================
+    ragIndex: (vaultPath, excludedFolders) =>
+        ipcRenderer.invoke('rag:index', { vaultPath, excludedFolders }),
+    ragStop: () => ipcRenderer.invoke('rag:stop'),
+    ragStatus: () => ipcRenderer.invoke('rag:status'),
+    ragChunkCount: () => ipcRenderer.invoke('rag:chunkCount'),
+    ragSearch: (query, vaultPath, topK) =>
+        ipcRenderer.invoke('rag:search', { query, vaultPath, topK }),
+    ragBuildPrompt: (query, chunks, aboutMe) =>
+        ipcRenderer.invoke('rag:buildPrompt', { query, chunks, aboutMe }),
+    ragRemoveFile: (filePath) => ipcRenderer.invoke('rag:removeFile', { filePath }),
+
+    // RAG event subscriptions
+    onRAGProgress: (callback) => {
+        const handler = (_event, payload) => callback(payload);
+        ipcRenderer.on('rag:progress', handler);
+        return () => ipcRenderer.removeListener('rag:progress', handler);
+    },
+    onRAGDone: (callback) => {
+        const handler = (_event, payload) => callback(payload);
+        ipcRenderer.on('rag:done', handler);
+        return () => ipcRenderer.removeListener('rag:done', handler);
+    },
+    onRAGError: (callback) => {
+        const handler = (_event, payload) => callback(payload);
+        ipcRenderer.on('rag:error', handler);
+        return () => ipcRenderer.removeListener('rag:error', handler);
+    },
+    onRAGIdle: (callback) => {
+        const handler = (_event, payload) => callback(payload);
+        ipcRenderer.on('rag:idle', handler);
+        return () => ipcRenderer.removeListener('rag:idle', handler);
+    },
+
+    // ============================================
+    // Phase 8: Productivity extras
+    // ============================================
+    hotkeyRegister: () => ipcRenderer.invoke('hotkey:register'),
+    hotkeyUnregister: () => ipcRenderer.invoke('hotkey:unregister'),
+    hotkeyToggleQuickWindow: () => ipcRenderer.invoke('hotkey:toggleQuickWindow'),
+    hotkeyIsQuickWindowVisible: () => ipcRenderer.invoke('hotkey:isQuickWindowVisible'),
+
+    clipboardRead: () => ipcRenderer.invoke('clipboard:read'),
+    clipboardWrite: (text) => ipcRenderer.invoke('clipboard:write', { text }),
+    clipboardProcessAndOpen: (text) => ipcRenderer.invoke('clipboard:processAndOpen', { text }),
+
+    trayCreate: () => ipcRenderer.invoke('tray:create'),
+    trayDestroy: () => ipcRenderer.invoke('tray:destroy'),
+    windowHide: () => ipcRenderer.invoke('window:hide'),
+
+    startupGet: () => ipcRenderer.invoke('startup:get'),
+    startupSet: (enabled) => ipcRenderer.invoke('startup:set', { enabled }),
+
+    ollamaWarmUp: (model) => ipcRenderer.invoke('ollama:warmUp', { model }),
+    ollamaCheckAvailable: () => ipcRenderer.invoke('ollama:checkAvailable'),
+
+    backupCreate: (outputPath) => ipcRenderer.invoke('backup:create', { outputPath }),
+    backupRestore: (zipPath) => ipcRenderer.invoke('backup:restore', { zipPath }),
+    backupGetDefaultPath: () => ipcRenderer.invoke('backup:getDefaultPath'),
+
+    lockIsConfigured: () => ipcRenderer.invoke('lock:isConfigured'),
+    lockSet: (password) => ipcRenderer.invoke('lock:set', { password }),
+    lockRemove: () => ipcRenderer.invoke('lock:remove'),
+    lockCheck: (password) => ipcRenderer.invoke('lock:check', { password }),
+    lockRequireUnlock: (password) => ipcRenderer.invoke('lock:requireUnlock', { password }),
+
+    ollamaOpenInstallLink: () => ipcRenderer.invoke('ollama:openInstallLink'),
 });
 
 console.log('Preload script loaded successfully - chat API exposed');

@@ -17,6 +17,10 @@ import {
     onBatchProgress,
     onBatchDone,
     onBatchError,
+    onRAGProgress,
+    onRAGDone,
+    onRAGError,
+    onRAGIdle,
 } from '../api/chatAPI';
 import { useConversationStore } from '../store/conversationStore';
 
@@ -36,15 +40,25 @@ export function ChatPage() {
         processing,
         setProcessing,
         clearProcessing,
+        useMyVault,
+        setUseMyVault,
+        vaultGet,
     } = useConversationStore();
 
     const [modelOptions, setModelOptions] = useState([]);
     const [summariseNote, setSummariseNote] = useState({ open: false, content: '' });
+    const [vaultConfigured, setVaultConfigured] = useState(false);
 
     useEffect(() => {
         loadModels();
         loadModelPresets();
-    }, [loadModels, loadModelPresets]);
+        (async () => {
+            try {
+                const { vaultPath } = await vaultGet();
+                setVaultConfigured(!!vaultPath);
+            } catch {}
+        })();
+    }, [loadModels, loadModelPresets, vaultGet]);
 
     useEffect(() => {
         const options = [];
@@ -156,6 +170,53 @@ export function ChatPage() {
         };
     }, [setProcessing]);
 
+    // RAG indexing progress subscriptions.
+    useEffect(() => {
+        const unsubProgress = onRAGProgress((payload) => {
+            setProcessing({
+                jobId: 'rag',
+                type: 'rag',
+                stage: payload.status,
+                part: payload.current,
+                total: payload.total,
+                message: `Indexing ${payload.file}…`,
+                status: 'processing',
+            });
+        });
+        const unsubDone = onRAGDone((payload) => {
+            setProcessing({
+                jobId: 'rag',
+                type: 'rag',
+                stage: 'done',
+                part: payload.total || 0,
+                total: payload.total || 0,
+                message: `Indexed ${payload.indexed} files, skipped ${payload.skipped}.`,
+                status: 'completed',
+            });
+        });
+        const unsubError = onRAGError((payload) => {
+            setProcessing({
+                jobId: 'rag',
+                type: 'rag',
+                stage: 'error',
+                part: 0,
+                total: 0,
+                message: payload.message || 'RAG error.',
+                status: 'error',
+            });
+        });
+        const unsubIdle = onRAGIdle(() => {
+            setProcessing(null);
+        });
+
+        return () => {
+            unsubProgress();
+            unsubDone();
+            unsubError();
+            unsubIdle();
+        };
+    }, [setProcessing]);
+
     const handleSummariseToNote = useCallback(async () => {
         const conversationId = activeConversationId;
         if (!conversationId) {
@@ -230,6 +291,16 @@ export function ChatPage() {
                                 >
                                     Summarise to Note
                                 </button>
+                                <label className="flex items-center gap-1 text-xs text-gray-400 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={useMyVault}
+                                        onChange={(e) => setUseMyVault(e.target.checked)}
+                                        disabled={!vaultConfigured}
+                                        className="rounded bg-[#1a1a2e] border border-gray-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    {vaultConfigured ? 'Use My Vault' : 'Vault not configured'}
+                                </label>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-400 uppercase tracking-wider">Model</span>

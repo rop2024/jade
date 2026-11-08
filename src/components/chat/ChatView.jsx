@@ -8,6 +8,10 @@ import {
     onError,
     ollamaStatus,
     contextBuildMessages,
+    ragSearch,
+    ragBuildPrompt,
+    onRAGDone,
+    onRAGError,
 } from '../../api/chatAPI';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
@@ -49,6 +53,11 @@ export function ChatView() {
         clearAttachments,
         importFile,
         chunkFileContent,
+        useMyVault,
+        searchRAG,
+        buildRAGPrompt,
+        vaultGet,
+        addFeedbackExample,
     } = useConversationStore();
 
     const assistantMessageIdRef = useRef(null);
@@ -60,11 +69,14 @@ export function ChatView() {
     const [saveToVault, setSaveToVault] = useState({ open: false, content: '' });
     const [summariseNote, setSummariseNote] = useState({ open: false, content: '' });
     const [attachDialog, setAttachDialog] = useState(false);
+    const [ragSources, setRAGSources] = useState([]);
 
     useEffect(() => {
         let unsubToken;
         let unsubDone;
         let unsubError;
+        let unsubRAGDone;
+        let unsubRAGError;
 
         (async () => {
             try {
@@ -120,10 +132,20 @@ export function ChatView() {
             setError(message);
         });
 
+        unsubRAGDone = onRAGDone(({ results, query }) => {
+            setRAGSources(results);
+        });
+
+        unsubRAGError = onRAGError(({ message }) => {
+            console.error('RAG error:', message);
+        });
+
         return () => {
             unsubToken?.();
             unsubDone?.();
             unsubError?.();
+            unsubRAGDone?.();
+            unsubRAGError?.();
         };
     }, [
         addMessage,
@@ -220,6 +242,35 @@ export function ChatView() {
                 attachments.map((a) => `### ${a.filename}\n${a.content}`).join('\n---\n');
         }
 
+        // RAG: when "Use My Vault" is enabled, retrieve relevant notes and
+        // build a contextual prompt before sending to the model.
+        let finalContent = content + attachmentContext;
+        if (useMyVault) {
+            try {
+                const { vaultPath } = await vaultGet();
+                if (vaultPath) {
+                    const chunks = await searchRAG(content, vaultPath, 6);
+                    if (chunks.length > 0) {
+                        const { prompt } = await buildRAGPrompt(content, chunks, aboutMe);
+                        finalContent = prompt + attachmentContext;
+                        setRAGSources(chunks.map((c) => ({
+                            path: c.sourcePath || c.path,
+                            heading: c.sourceHeading || c.heading,
+                            text: c.text,
+                            similarity: c.similarity,
+                        })));
+                    } else {
+                        setRAGSources([]);
+                    }
+                }
+            } catch (err) {
+                console.error('RAG retrieval failed:', err.message);
+                setRAGSources([]);
+            }
+        } else {
+            setRAGSources([]);
+        }
+
         addMessage({ id: userMessageId, role: 'user', content, created_at: now });
         await messageSave({
             id: userMessageId,
@@ -236,7 +287,7 @@ export function ChatView() {
         try {
             await sendMessages(conversationId, [
                 ...currentMessages,
-                { role: 'user', content: content + attachmentContext },
+                { role: 'user', content: finalContent },
             ], modeId);
             clearAttachments();
         } catch (err) {
@@ -258,6 +309,11 @@ export function ChatView() {
         setPendingModeId,
         attachments,
         clearAttachments,
+        useMyVault,
+        searchRAG,
+        buildRAGPrompt,
+        vaultGet,
+        aboutMe,
     ]);
 
     const handleStop = useCallback(() => {
@@ -304,6 +360,22 @@ export function ChatView() {
     const handleSaveToVault = useCallback((content) => {
         setSaveToVault({ open: true, content });
     }, []);
+
+    const handleFeedback = useCallback(async (messageId, content) => {
+        if (!activeModeId) {
+            setError('No active mode to save feedback example.');
+            return;
+        }
+        try {
+            await addFeedbackExample(activeModeId, {
+                input: '', // We don't have the input here easily; could store it
+                output: content,
+                correctedOutput: content,
+            });
+        } catch (err) {
+            setError('Failed to save feedback: ' + err.message);
+        }
+    }, [activeModeId, addFeedbackExample, setError]);
 
     const handleSummariseToNote = useCallback(async () => {
         const conversationId = activeConversationId;
@@ -444,6 +516,8 @@ export function ChatView() {
                     setEditingId(id);
                 }}
                 onSaveToVault={handleSaveToVault}
+                sources={ragSources}
+                onFeedback={handleFeedback}
             />
             </div>
             {editingId && (

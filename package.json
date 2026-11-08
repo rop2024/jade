@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.starter.app",
-    "productName": "Electron React Starter",
+    "productName": "LLMDesk",
     "files": [
       "dist/**/*",
       "electron/**/*",
@@ -24,23 +24,34 @@
       "api/**/*",
       "sync/**/*",
       "storage/**/*",
+      "resources/**/*",
       "!node_modules/.bin",
       "node_modules/**/*"
     ],
     "directories": {
       "output": "release"
     },
+    "extraMetadata": {
+      "main": "electron/main/main.js"
+    },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "extraMetadata": {
+        "main": "electron/main/main.js"
+      }
     },
     "mac": {
       "target": "dmg"
     },
     "linux": {
       "target": "AppImage"
+    },
+    "asar": {
+      "unpackDir": "node_modules/better-sqlite3"
     }
   },
   "dependencies": {
+    "adm-zip": "^0.6.1",
     "axios": "^1.6.0",
     "better-sqlite3": "^13.0.3",
     "electron-settings": "^4.0.0",

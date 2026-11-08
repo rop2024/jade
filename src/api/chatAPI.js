@@ -599,6 +599,320 @@ export function onWatchDetected(callback) {
 }
 
 /* ============================================
+ * RAG (vault search + retrieval-augmented generation)
+ * ============================================ */
+
+/**
+ * @param {{vaultPath:string, excludedFolders:Array<string>}} payload
+ * @returns {Promise<{started:boolean}|{error:string}>}
+ */
+export async function ragIndex(payload) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragIndex(payload);
+}
+
+/** @returns {Promise<{stopped:boolean}>} */
+export async function ragStop() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragStop();
+}
+
+/** @returns {Promise<{status:string,current:number,total:number,file:string}>} */
+export async function ragStatus() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragStatus();
+}
+
+/** @returns {Promise<{count:number}>} */
+export async function ragChunkCount() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragChunkCount();
+}
+
+/**
+ * @param {string} query
+ * @param {string} vaultPath
+ * @param {number} [topK]
+ * @returns {Promise<{results:Array<{id:string,path:string,heading:string|null,text:string,similarity:number,sourcePath:string,sourceHeading:string|null}>}>}
+ */
+export async function ragSearch(query, vaultPath, topK) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragSearch(query, vaultPath, topK);
+}
+
+/**
+ * @param {string} query
+ * @param {Array<{path:string,heading:string|null,text:string,similarity:number}>} chunks
+ * @param {string} aboutMe
+ * @returns {Promise<{prompt:string}>}
+ */
+export async function ragBuildPrompt(query, chunks, aboutMe) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragBuildPrompt(query, chunks, aboutMe);
+}
+
+/** @param {string} filePath @returns {Promise<{removed:boolean}>} */
+export async function ragRemoveFile(filePath) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ragRemoveFile(filePath);
+}
+
+/** @param {(payload:any) => void} callback @returns {() => void} */
+export function onRAGProgress(callback) {
+    const a = getApi();
+    if (!a) return () => {};
+    return a.onRAGProgress(callback);
+}
+
+/** @param {(payload:any) => void} callback @returns {() => void} */
+export function onRAGDone(callback) {
+    const a = getApi();
+    if (!a) return () => {};
+    return a.onRAGDone(callback);
+}
+
+/** @param {(payload:any) => void} callback @returns {() => void} */
+export function onRAGError(callback) {
+    const a = getApi();
+    if (!a) return () => {};
+    return a.onRAGError(callback);
+}
+
+/** @param {(payload:any) => void} callback @returns {() => void} */
+export function onRAGIdle(callback) {
+    const a = getApi();
+    if (!a) return () => {};
+    return a.onRAGIdle(callback);
+}
+
+/* ============================================
+ * Phase 8: Productivity extras
+ * ============================================ */
+
+/**
+ * @returns {Promise<{registered:boolean}>}
+ */
+export async function hotkeyRegister() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.hotkeyRegister();
+}
+
+/**
+ * @returns {Promise<{unregistered:boolean}>}
+ */
+export async function hotkeyUnregister() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.hotkeyUnregister();
+}
+
+/**
+ * @returns {Promise<{toggled:boolean}>}
+ */
+export async function hotkeyToggleQuickWindow() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.hotkeyToggleQuickWindow();
+}
+
+/**
+ * @returns {Promise<{visible:boolean}>}
+ */
+export async function hotkeyIsQuickWindowVisible() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.hotkeyIsQuickWindowVisible();
+}
+
+/**
+ * @returns {Promise<{text:string}>}
+ */
+export async function clipboardRead() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.clipboardRead();
+}
+
+/**
+ * @param {string} text
+ * @returns {Promise<{written:boolean}>}
+ */
+export async function clipboardWrite(text) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.clipboardWrite(text);
+}
+
+/**
+ * @param {string} text
+ * @returns {Promise<{opened:boolean}>}
+ */
+export async function clipboardProcessAndOpen(text) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.clipboardProcessAndOpen(text);
+}
+
+/**
+ * @returns {Promise<{created:boolean}>}
+ */
+export async function trayCreate() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.trayCreate();
+}
+
+/**
+ * @returns {Promise<{destroyed:boolean}>}
+ */
+export async function trayDestroy() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.trayDestroy();
+}
+
+/**
+ * @returns {Promise<{hidden:boolean}>}
+ */
+export async function windowHide() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.windowHide();
+}
+
+/**
+ * @returns {Promise<{enabled:boolean}>}
+ */
+export async function startupGet() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.startupGet();
+}
+
+/**
+ * @param {boolean} enabled
+ * @returns {Promise<{success:boolean,enabled:boolean}|{success:boolean,error:string}>}
+ */
+export async function startupSet(enabled) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.startupSet(enabled);
+}
+
+/**
+ * @param {string} [model]
+ * @returns {Promise<{success:boolean,error?:string}>}
+ */
+export async function ollamaWarmUp(model) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ollamaWarmUp(model);
+}
+
+/**
+ * @returns {Promise<{available:boolean}>}
+ */
+export async function ollamaCheckAvailable() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ollamaCheckAvailable();
+}
+
+/**
+ * @param {string} [outputPath]
+ * @returns {Promise<{success:boolean,path?:string,error?:string}>}
+ */
+export async function backupCreate(outputPath) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.backupCreate(outputPath);
+}
+
+/**
+ * @param {string} zipPath
+ * @returns {Promise<{success:boolean,error?:string}>}
+ */
+export async function backupRestore(zipPath) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.backupRestore(zipPath);
+}
+
+/**
+ * @returns {Promise<{path:string}>}
+ */
+export async function backupGetDefaultPath() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.backupGetDefaultPath();
+}
+
+/**
+ * @returns {Promise<{configured:boolean}>}
+ */
+export async function lockIsConfigured() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.lockIsConfigured();
+}
+
+/**
+ * @param {string} password
+ * @returns {Promise<{set:boolean}>}
+ */
+export async function lockSet(password) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.lockSet(password);
+}
+
+/**
+ * @returns {Promise<{removed:boolean}>}
+ */
+export async function lockRemove() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.lockRemove();
+}
+
+/**
+ * @param {string} password
+ * @returns {Promise<{valid:boolean}>}
+ */
+export async function lockCheck(password) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.lockCheck(password);
+}
+
+/**
+ * @param {string} password
+ * @returns {Promise<{unlocked:boolean}>}
+ */
+export async function lockRequireUnlock(password) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.lockRequireUnlock(password);
+}
+
+/**
+ * @returns {Promise<{opened:boolean}>}
+ */
+export async function ollamaOpenInstallLink() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ollamaOpenInstallLink();
+}
+
+/* ============================================
  * Settings
  * ============================================ */
 
@@ -672,6 +986,40 @@ export default {
     onBatchDone,
     onBatchError,
     onWatchDetected,
+    ragIndex,
+    ragStop,
+    ragStatus,
+    ragChunkCount,
+    ragSearch,
+    ragBuildPrompt,
+    ragRemoveFile,
+    onRAGProgress,
+    onRAGDone,
+    onRAGError,
+    onRAGIdle,
+    hotkeyRegister,
+    hotkeyUnregister,
+    hotkeyToggleQuickWindow,
+    hotkeyIsQuickWindowVisible,
+    clipboardRead,
+    clipboardWrite,
+    clipboardProcessAndOpen,
+    trayCreate,
+    trayDestroy,
+    windowHide,
+    startupGet,
+    startupSet,
+    ollamaWarmUp,
+    ollamaCheckAvailable,
+    backupCreate,
+    backupRestore,
+    backupGetDefaultPath,
+    lockIsConfigured,
+    lockSet,
+    lockRemove,
+    lockCheck,
+    lockRequireUnlock,
+    ollamaOpenInstallLink,
     settingGet,
     settingSet,
     isElectron,

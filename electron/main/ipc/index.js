@@ -10,6 +10,7 @@ const { registerModesIpcHandlers } = require('./modes');
 const { registerContextIpcHandlers } = require('./context');
 const { registerFilesIpcHandlers } = require('./files');
 const { registerDocumentIpcHandlers } = require('./document');
+const { registerRAGIpcHandlers } = require('./rag');
 
 function registerIpcHandlers(ipcMain, {
     mainWindow,
@@ -139,6 +140,11 @@ function registerIpcHandlers(ipcMain, {
     // Document Processing Handlers (map-reduce, batch, watch)
     // ============================================
     registerDocumentIpcHandlers(mainWindow);
+
+    // ============================================
+    // RAG Handlers (vault search + retrieval-augmented generation)
+    // ============================================
+    registerRAGIpcHandlers(mainWindow);
 }
 
 module.exports = registerIpcHandlers;

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { MessageActions } from './MessageActions';
 
-export function MessageBubble({ message, onCopy, onRegenerate, onEdit }) {
+export function MessageBubble({ message, onCopy, onRegenerate, onEdit, onSaveToVault, onFeedback }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
 
@@ -29,6 +29,8 @@ export function MessageBubble({ message, onCopy, onRegenerate, onEdit }) {
           onCopy={onCopy}
           onRegenerate={onRegenerate}
           onEdit={onEdit}
+          onSaveToVault={onSaveToVault}
+          onFeedback={onFeedback}
         />
       </div>
     </div>

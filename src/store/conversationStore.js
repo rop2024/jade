@@ -36,6 +36,39 @@ import {
     fileDetectDates,
     fileEstimateTokens,
     fileIsSupported,
+    ragIndex,
+    ragStop,
+    ragStatus,
+    ragChunkCount,
+    ragSearch,
+    ragBuildPrompt,
+    onRAGProgress,
+    onRAGDone,
+    onRAGError,
+    onRAGIdle,
+    hotkeyRegister,
+    hotkeyUnregister,
+    hotkeyToggleQuickWindow,
+    hotkeyIsQuickWindowVisible,
+    clipboardRead,
+    clipboardWrite,
+    clipboardProcessAndOpen,
+    trayCreate,
+    trayDestroy,
+    windowHide,
+    startupGet,
+    startupSet,
+    ollamaWarmUp,
+    ollamaCheckAvailable,
+    backupCreate,
+    backupRestore,
+    backupGetDefaultPath,
+    lockIsConfigured,
+    lockSet,
+    lockRemove,
+    lockCheck,
+    lockRequireUnlock,
+    ollamaOpenInstallLink,
     settingGet,
     settingSet,
     isElectron,
@@ -460,6 +493,143 @@ export const useConversationStore = create((set, get) => ({
 
     approveWatch: async (payload) => {
         return await watchApprove(payload);
+    },
+
+    // ----- RAG -----
+    useMyVault: false,
+    ragIndexing: false,
+    ragProgress: { status: 'idle', current: 0, total: 0, file: '' },
+    ragSources: [],
+
+    setUseMyVault: (enabled) => {
+        set({ useMyVault: enabled });
+    },
+
+    setRAGSources: (sources) => {
+        set({ ragSources: sources });
+    },
+
+    setRAGProgress: (progress) => {
+        set({ ragProgress: progress, ragIndexing: progress.status === 'indexing' });
+    },
+
+    indexVault: async (vaultPath, excludedFolders) => {
+        set({ ragIndexing: true });
+        const result = await ragIndex({ vaultPath, excludedFolders });
+        set({ ragIndexing: false });
+        return result;
+    },
+
+    stopRAGIndex: async () => {
+        await ragStop();
+        set({ ragIndexing: false });
+    },
+
+    getRAGStatus: async () => {
+        return await ragStatus();
+    },
+
+    getRAGChunkCount: async () => {
+        return await ragChunkCount();
+    },
+
+    searchRAG: async (query, vaultPath, topK = 6) => {
+        const { results } = await ragSearch(query, vaultPath, topK);
+        set({ ragSources: results });
+        return results;
+    },
+
+    buildRAGPrompt: async (query, chunks, aboutMe) => {
+        return await ragBuildPrompt(query, chunks, aboutMe);
+    },
+
+    // ----- Phase 8: Productivity extras -----
+    hotkeyRegister: async () => {
+        return await hotkeyRegister();
+    },
+
+    hotkeyUnregister: async () => {
+        return await hotkeyUnregister();
+    },
+
+    hotkeyToggleQuickWindow: async () => {
+        return await hotkeyToggleQuickWindow();
+    },
+
+    clipboardRead: async () => {
+        return await clipboardRead();
+    },
+
+    clipboardWrite: async (text) => {
+        return await clipboardWrite(text);
+    },
+
+    clipboardProcessAndOpen: async (text) => {
+        return await clipboardProcessAndOpen(text);
+    },
+
+    trayCreate: async () => {
+        return await trayCreate();
+    },
+
+    trayDestroy: async () => {
+        return await trayDestroy();
+    },
+
+    windowHide: async () => {
+        return await windowHide();
+    },
+
+    startupGet: async () => {
+        return await startupGet();
+    },
+
+    startupSet: async (enabled) => {
+        return await startupSet(enabled);
+    },
+
+    ollamaWarmUp: async (model) => {
+        return await ollamaWarmUp(model);
+    },
+
+    ollamaCheckAvailable: async () => {
+        return await ollamaCheckAvailable();
+    },
+
+    backupCreate: async (outputPath) => {
+        return await backupCreate(outputPath);
+    },
+
+    backupRestore: async (zipPath) => {
+        return await backupRestore(zipPath);
+    },
+
+    backupGetDefaultPath: async () => {
+        return await backupGetDefaultPath();
+    },
+
+    lockIsConfigured: async () => {
+        return await lockIsConfigured();
+    },
+
+    lockSet: async (password) => {
+        return await lockSet(password);
+    },
+
+    lockRemove: async () => {
+        return await lockRemove();
+    },
+
+    lockCheck: async (password) => {
+        return await lockCheck(password);
+    },
+
+    lockRequireUnlock: async (password) => {
+        return await lockRequireUnlock(password);
+    },
+
+    ollamaOpenInstallLink: async () => {
+        return await ollamaOpenInstallLink();
     },
 }));
 

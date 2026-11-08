@@ -8,6 +8,15 @@ const {
 } = require('../services/context');
 const { saveNote, listNoteTitles } = require('../services/notes');
 const { parseSlashCommand, executeBuiltin } = require('../services/commands');
+const {
+    loadMode,
+    saveMode,
+    deleteMode,
+    getModeHistory,
+    restoreModeVersion,
+    addFeedbackExample,
+    deleteFeedbackExample,
+} = require('../services/modes');
 
 function registerContextIpcHandlers(mainWindow) {
     // ============================================
@@ -76,6 +85,34 @@ function registerContextIpcHandlers(mainWindow) {
     // ============================================
     ipcMain.handle('command:parse', (event, { input, modes }) => {
         return parseSlashCommand(input, modes);
+    });
+
+    // ============================================
+    // Mode version history
+    // ============================================
+    ipcMain.handle('mode:history', (event, { modeId }) => {
+        return { history: getModeHistory(modeId) };
+    });
+
+    ipcMain.handle('mode:restoreVersion', (event, { modeId, timestamp }) => {
+        const restored = restoreModeVersion(modeId, timestamp);
+        if (restored) {
+            saveMode(restored);
+            return { restored: true, mode: restored };
+        }
+        return { restored: false };
+    });
+
+    // ============================================
+    // Feedback examples (thumbs-up)
+    // ============================================
+    ipcMain.handle('mode:addFeedbackExample', (event, { modeId, example }) => {
+        const result = addFeedbackExample(modeId, example);
+        return { saved: !!result, mode: result };
+    });
+
+    ipcMain.handle('mode:deleteFeedbackExample', (event, { modeId, exampleId }) => {
+        return { deleted: deleteFeedbackExample(modeId, exampleId) };
     });
 }
 
