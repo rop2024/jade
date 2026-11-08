@@ -17,14 +17,18 @@ const ErrorHandler = require('./services/ErrorHandler').ErrorHandler;
 const { DatabaseService } = require('../../database/database');
 const { getApiClient } = require('../../api/client');
 const { createEngine } = require('../../sync/engine');
+const { getDatabase } = require('./services/db');
+const { seedDefaultModes } = require('./services/modes');
+const { ensureAboutMe } = require('./services/context');
 
 // IPC Handlers
 const registerIpcHandlers = require('./ipc');
 
 // Global instances
 let mainWindow = null;
-let settingsService = null;
-let databaseService = null;
+    let settingsService = null;
+    let databaseService = null;
+    let chatDatabase = null;
 let apiClient = null;
 let engine = null;
 let loggerService = null;
@@ -56,6 +60,13 @@ async function initializeServices() {
     databaseService = new DatabaseService();
     await databaseService.initialize();
 
+    // Chat persistence database (better-sqlite3, WAL mode)
+    chatDatabase = getDatabase();
+
+    // Seed default modes and personal context file on first launch
+    seedDefaultModes();
+    ensureAboutMe();
+
     // Get API configuration from settings
     const settings = await settingsService.getSettings();
     apiClient = getApiClient({
@@ -77,6 +88,7 @@ async function initializeServices() {
     return {
         settingsService,
         databaseService,
+        chatDatabase,
         apiClient,
         engine,
         loggerService,

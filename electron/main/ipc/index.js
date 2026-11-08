@@ -4,6 +4,12 @@
  */
 const { app, dialog, shell } = require('electron');
 const fs = require('fs').promises;
+const { registerChatIpcHandlers } = require('./chat');
+const { registerConversationIpcHandlers } = require('./conversation');
+const { registerModesIpcHandlers } = require('./modes');
+const { registerContextIpcHandlers } = require('./context');
+const { registerFilesIpcHandlers } = require('./files');
+const { registerDocumentIpcHandlers } = require('./document');
 
 function registerIpcHandlers(ipcMain, {
     mainWindow,
@@ -103,6 +109,36 @@ function registerIpcHandlers(ipcMain, {
         await shell.openExternal(url);
         return { success: true };
     });
+
+    // ============================================
+    // Chat Handlers (Ollama)
+    // ============================================
+    registerChatIpcHandlers(mainWindow);
+
+    // ============================================
+    // Conversation Handlers (SQLite)
+    // ============================================
+    registerConversationIpcHandlers(mainWindow);
+
+    // ============================================
+    // Mode Handlers
+    // ============================================
+    registerModesIpcHandlers();
+
+    // ============================================
+    // Context Handlers (personal context + prompt assembly)
+    // ============================================
+    registerContextIpcHandlers(mainWindow);
+
+    // ============================================
+    // File Import Handlers
+    // ============================================
+    registerFilesIpcHandlers();
+
+    // ============================================
+    // Document Processing Handlers (map-reduce, batch, watch)
+    // ============================================
+    registerDocumentIpcHandlers(mainWindow);
 }
 
 module.exports = registerIpcHandlers;
