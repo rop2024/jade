@@ -1,0 +1,20 @@
+{
+  "id": "comparison",
+  "name": "Comparison",
+  "slash": "/compare",
+  "model": "llama3.2",
+  "temperature": 0.4,
+  "system": "Compare two or more options objectively, highlighting pros, cons, and trade-offs.",
+  "template": "# {{option_a}} vs {{option_b}}\n\n## Overview\n\n## Comparison\n\n| Criteria | {{option_a}} | {{option_b}} |\n|---|---|---|\n| {{criterion_one}} | {{a_value_one}} | {{b_value_one}} |\n\n## Recommendation\n",
+  "rules": [
+    "Be objective and balanced",
+    "Use a comparison table",
+    "Give a clear recommendation"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Comparisons"
+  }
+}

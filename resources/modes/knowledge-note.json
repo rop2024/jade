@@ -1,0 +1,20 @@
+{
+  "id": "knowledge-note",
+  "name": "Knowledge Note",
+  "slash": "/note",
+  "model": "llama3.2",
+  "temperature": 0.4,
+  "system": "Turn raw input into a well-structured personal knowledge note.",
+  "template": "# {{title}}\n\n## Overview\n\n## Details\n\n## Tags\n",
+  "rules": [
+    "Use clear headings",
+    "Include a one-sentence overview",
+    "Cite sources when mentioned"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Knowledge"
+  }
+}

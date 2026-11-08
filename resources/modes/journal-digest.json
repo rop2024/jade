@@ -1,0 +1,20 @@
+{
+  "id": "journal-digest",
+  "name": "Journal Digest",
+  "slash": "/journal",
+  "model": "qwen3:4b",
+  "temperature": 0.3,
+  "system": "Process my journal entries into a concise, structured digest.",
+  "template": "# Summary\n\n## Key Points\n\n## Next Steps\n",
+  "rules": [
+    "Bullets only",
+    "Do not invent information",
+    "Keep it under 200 words"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Notes"
+  }
+}

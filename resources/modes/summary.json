@@ -1,0 +1,20 @@
+{
+  "id": "summary",
+  "name": "Summary",
+  "slash": "/summary",
+  "model": "llama3.2",
+  "temperature": 0.3,
+  "system": "Summarize content concisely while preserving the key points and decisions.",
+  "template": "# Summary: {{topic}}\n\n## TL;DR\n\n## Key Points\n\n## Decisions\n\n## Action Items\n",
+  "rules": [
+    "Start with a one-sentence TL;DR",
+    "Use bullets for key points",
+    "Include action items with owners"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Summaries"
+  }
+}

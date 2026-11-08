@@ -1,0 +1,20 @@
+{
+  "id": "concept-explainer",
+  "name": "Concept Explainer",
+  "slash": "/explain",
+  "model": "llama3.2",
+  "temperature": 0.5,
+  "system": "Explain complex concepts clearly and concisely for a technical audience.",
+  "template": "## What is {{concept}}?\n\n## How it works\n\n## Why it matters\n\n## Related concepts\n",
+  "rules": [
+    "Avoid unnecessary jargon",
+    "Use analogies where helpful",
+    "Keep explanations under 300 words"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": null,
+    "folder": null
+  }
+}

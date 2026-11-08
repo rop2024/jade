@@ -1,0 +1,20 @@
+{
+  "id": "how-to",
+  "name": "How-To Guide",
+  "slash": "/howto",
+  "model": "llama3.2",
+  "temperature": 0.4,
+  "system": "Write a clear, step-by-step how-to guide for accomplishing a task.",
+  "template": "# How to {{task}}\n\n## Prerequisites\n\n## Steps\n\n1. {{step_one}}\n2. {{step_two}}\n\n## Tips\n\n## Troubleshooting\n",
+  "rules": [
+    "Use imperative verbs for each step",
+    "Include prerequisites",
+    "Keep steps short and actionable"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Guides"
+  }
+}

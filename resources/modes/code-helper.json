@@ -1,0 +1,20 @@
+{
+  "id": "code-helper",
+  "name": "Code Helper",
+  "slash": "/code",
+  "model": "qwen3:4b",
+  "temperature": 0.2,
+  "system": "Write clean, well-documented code. Explain the approach and any trade-offs.",
+  "template": "## Approach\n\n## Code\n\n```\n{{language}}\n{{code}}\n```\n\n## Notes\n",
+  "rules": [
+    "Include comments in the code",
+    "Mention dependencies required",
+    "Highlight edge cases"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": null,
+    "folder": null
+  }
+}

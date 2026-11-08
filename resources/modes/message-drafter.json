@@ -1,0 +1,20 @@
+{
+  "id": "message-drafter",
+  "name": "Message Drafter",
+  "slash": "/draft",
+  "model": "llama3.2",
+  "temperature": 0.5,
+  "system": "Draft clear, professional messages based on the provided context.",
+  "template": "## Subject\n{{subject}}\n\n## Body\n\n{{body}}\n",
+  "rules": [
+    "Keep it concise",
+    "Use a professional tone",
+    "Include a clear call to action"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": null,
+    "folder": null
+  }
+}

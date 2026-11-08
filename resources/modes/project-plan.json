@@ -1,0 +1,20 @@
+{
+  "id": "project-plan",
+  "name": "Project Plan",
+  "slash": "/plan",
+  "model": "llama3.2",
+  "temperature": 0.5,
+  "system": "Create a structured project plan with goals, phases, timeline, and risks.",
+  "template": "# Project Plan: {{project_name}}\n\n## Objective\n\n## Phases\n\n### Phase 1: {{phase_one}}\n- {{phase_one_tasks}}\n\n## Timeline\n\n## Risks\n\n## Success Criteria\n",
+  "rules": [
+    "Define a clear objective",
+    "Break work into phases",
+    "Identify risks and success criteria"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Projects"
+  }
+}

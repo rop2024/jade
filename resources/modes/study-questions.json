@@ -1,0 +1,20 @@
+{
+  "id": "study-questions",
+  "name": "Study Questions",
+  "slash": "/study",
+  "model": "llama3.2",
+  "temperature": 0.5,
+  "system": "Generate study questions with answers to help review a topic.",
+  "template": "# Study Questions: {{topic}}\n\n## Question 1\nQ: {{question_one}}\n\nA: {{answer_one}}\n\n## Question 2\nQ: {{question_two}}\n\nA: {{answer_two}}\n",
+  "rules": [
+    "Cover key concepts",
+    "Vary difficulty",
+    "Include answers"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": "vault",
+    "folder": "Study"
+  }
+}

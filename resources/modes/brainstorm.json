@@ -1,0 +1,20 @@
+{
+  "id": "brainstorm",
+  "name": "Brainstorm",
+  "slash": "/brainstorm",
+  "model": "llama3.2",
+  "temperature": 0.8,
+  "system": "Generate creative, diverse ideas for the given topic.",
+  "template": "## Ideas\n\n### 1. {{title}}\n\n{{description}}\n\n### 2. {{title}}\n\n{{description}}\n",
+  "rules": [
+    "Quantity over quality initially",
+    "No idea is too wild",
+    "Group related ideas together"
+  ],
+  "examples": [],
+  "output": {
+    "type": "markdown",
+    "saveTo": null,
+    "folder": null
+  }
+}
