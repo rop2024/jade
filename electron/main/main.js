@@ -75,7 +75,7 @@ async function initializeServices() {
     const settings = await settingsService.get();
     apiClient = getApiClient({
         timeout: settings.apiTimeout || 30000,
-        userAgent: 'StarterApp/1.0',
+        userAgent: 'Jade/1.0',
         proxy: settings.proxy || undefined,
     });
 
@@ -106,6 +106,7 @@ function createWindow() {
         height: 800,
         minWidth: 800,
         minHeight: 600,
+        title: 'Jade',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -114,7 +115,7 @@ function createWindow() {
         },
         show: false,
         frame: true,
-        backgroundColor: '#1a1a2e',
+        backgroundColor: '#080A0F',
     });
 
     // Load the app

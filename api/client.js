@@ -7,7 +7,7 @@ const axios = require('axios');
 function getApiClient(options = {}) {
     const baseUrl = options.baseUrl || 'https://api.example.com';
     const timeout = options.timeout || 30000;
-    const userAgent = options.userAgent || 'StarterApp/1.0';
+    const userAgent = options.userAgent || 'Jade/1.0';
 
     const client = axios.create({
         baseURL: baseUrl,

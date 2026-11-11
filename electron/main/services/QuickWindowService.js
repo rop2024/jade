@@ -18,6 +18,7 @@ function createQuickWindow() {
         height: 400,
         minWidth: 400,
         minHeight: 300,
+        title: 'Jade',
         alwaysOnTop: true,
         frame: true,
         show: false,
@@ -27,7 +28,7 @@ function createQuickWindow() {
             preload: path.join(__dirname, 'preload.js'),
             webSecurity: !isDev,
         },
-        backgroundColor: '#1a1a2e',
+        backgroundColor: '#080A0F',
     });
 
     if (isDev) {
