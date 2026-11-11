@@ -28,7 +28,6 @@ html, body, #root {
 
 *::-webkit-scrollbar-thumb {
   background: #293244;
-  border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
@@ -47,7 +46,6 @@ html, body, #root {
 .panel {
   background: #141925;
   border: 1px solid #293244;
-  border-bottom-right-radius: 14px;
 }
 
 .tech-label {

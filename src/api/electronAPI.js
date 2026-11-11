@@ -8,14 +8,16 @@ function makeStub() {
     return async () => { throw new Error(NOT_IN_ELECTRON); };
 }
 
-const STUB = new Proxy({}, {
+const TARGET = (typeof window !== 'undefined' && window.api) || {};
+
+export const electronAPI = new Proxy(TARGET, {
     get(_target, prop) {
         if (prop === 'isElectron') return false;
-        return makeStub();
-    },
+        const val = _target[prop];
+        return typeof val === 'function' ? val : makeStub();
+    }
 });
 
-export const electronAPI = (typeof window !== 'undefined' && window.electronAPI) ? window.electronAPI : STUB;
-export const isElectron = !!(typeof window !== 'undefined' && window.electronAPI);
+export const isElectron = !!(typeof window !== 'undefined' && window.api);
 
 export default electronAPI;

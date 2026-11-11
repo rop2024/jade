@@ -55,6 +55,10 @@ contextBridge.exposeInMainWorld('api', {
     settingGet: (key) => ipcRenderer.invoke('setting:get', { key }),
     settingSet: (key, value) => ipcRenderer.invoke('setting:set', { key, value }),
 
+    getSettings: () => ipcRenderer.invoke('settings:get'),
+    updateSettings: (settings) => ipcRenderer.invoke('settings:update', settings),
+    resetSettings: () => ipcRenderer.invoke('settings:reset'),
+
     // ============================================
     // Modes
     // ============================================
