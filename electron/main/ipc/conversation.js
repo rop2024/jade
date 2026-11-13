@@ -18,7 +18,7 @@ function registerConversationIpcHandlers(mainWindow) {
     ipcMain.handle('conversation:get', (event, { id }) => db.getConversation(id));
 
     ipcMain.handle('conversation:create', (event, { title, mode_id, model }) =>
-        db.createConversation({ title, mode_id, model }));
+        db.createConversation({ id: crypto.randomUUID(), title, mode_id, model }));
 
     ipcMain.handle('conversation:rename', (event, { id, title }) =>
         db.renameConversation(id, title));

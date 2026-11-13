@@ -36,16 +36,17 @@ export function Sidebar() {
  loadConversations();
  }, [loadConversations]);
 
- const filtered = conversations.filter((c) =>
- c.title.toLowerCase().includes(searchQuery.toLowerCase())
+ const filtered = conversations.filter(Boolean).filter((c) =>
+  c.title.toLowerCase().includes(searchQuery.toLowerCase())
  );
 
  const handleNewChat = async () => {
- const conversation = await createConversation({
- title: 'New Conversation',
- model: null,
- });
- setActiveConversation(conversation.id);
+  const conversation = await createConversation({
+   title: 'New Conversation',
+   model: null,
+  });
+  if (!conversation || !conversation.id) return;
+  setActiveConversation(conversation.id);
  };
 
  const handleSelect = (id) => {
