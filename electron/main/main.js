@@ -6,7 +6,6 @@ const { EventEmitter } = require('events');
 // The app still renders via SwiftShader (software WebGL).
 app.disableHardwareAcceleration();
 app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('no-sandbox');
 app.commandLine.appendSwitch('disable-software-rasterizer');
 
 // Services
@@ -40,6 +39,34 @@ let errorHandler = null;
 let eventEmitter = null;
 
 const isDev = !app.isPackaged;
+const DEBUG_IPC = process.env.JADE_DEBUG_IPC === '1';
+
+if (DEBUG_IPC) {
+    const originalHandle = ipcMain.handle.bind(ipcMain);
+    ipcMain.handle = (channel, listener) => {
+        const wrapped = async (event, ...args) => {
+            const start = Date.now();
+            try {
+                const result = await listener(event, ...args);
+                console.log(`[IPC:IN] ${channel} -> ${Date.now() - start}ms`);
+                return result;
+            } catch (err) {
+                console.log(`[IPC:ERR] ${channel} -> ${err.message}`);
+                throw err;
+            }
+        };
+        return originalHandle(channel, wrapped);
+    };
+
+    const originalOn = ipcMain.on.bind(ipcMain);
+    ipcMain.on = (channel, listener) => {
+        const wrapped = (event, ...args) => {
+            console.log(`[IPC:ON] ${channel}`);
+            listener(event, ...args);
+        };
+        return originalOn(channel, wrapped);
+    };
+}
 
 // ============================================
 // App Lifecycle

@@ -3,7 +3,6 @@ import { useConversationStore } from '../../store/conversationStore';
 import {
  chatStart,
  chatStop,
- chatReadFile,
  onToken,
  onDone,
  onError,
@@ -32,9 +31,8 @@ export function ChatView() {
  activeModeId,
  models,
  setInput,
- addMessage,
- appendToken,
- startStream,
+  addMessage,
+  startStream,
  finishStream,
  setError,
  stopStream,
@@ -66,11 +64,13 @@ export function ChatView() {
  loadDefaultModel,
  } = useConversationStore();
 
- const assistantMessageIdRef = useRef(null);
- const assistantContentRef = useRef('');
- const fileReadChainRef = useRef(Promise.resolve());
- const currentRequestIdRef = useRef(null);
- const [editingId, setEditingId] = useState(null);
+const assistantMessageIdRef = useRef(null);
+const assistantContentRef = useRef('');
+const currentRequestIdRef = useRef(null);
+const pendingTokenFlushRef = useRef(null);
+const activeConversationIdRef = useRef(activeConversationId);
+activeConversationIdRef.current = activeConversationId;
+const [editingId, setEditingId] = useState(null);
  const [editContent, setEditContent] = useState('');
  const [pendingModeId, setPendingModeId] = useState(null);
  const [saveToVault, setSaveToVault] = useState({ open: false, content: '' });
@@ -78,62 +78,64 @@ export function ChatView() {
  const [attachDialog, setAttachDialog] = useState(false);
  const [ragSources, setRAGSources] = useState([]);
 
- useEffect(() => {
- let unsubToken;
- let unsubDone;
- let unsubError;
- let unsubRAGDone;
- let unsubRAGError;
+// ============================================
+// One-time init: Ollama status, modes, context, default model
+// ============================================
+useEffect(() => {
+  (async () => {
+    try {
+      const status = await ollamaStatus();
+      if (!status.available) {
+        setError('Ollama is not running.\nStart Ollama and try again.');
+      }
+      await loadModes();
+      await loadAboutMe();
+      await loadDefaultModel();
+    } catch {
+      setError('Ollama is not running.\nStart Ollama and try again.');
+    }
+  })();
+}, [loadModes, loadAboutMe, loadDefaultModel, setError]);
 
- (async () => {
- try {
- const status = await ollamaStatus();
- if (!status.available) {
- setError('Ollama is not running.\nStart Ollama and try again.');
- }
- await loadModes();
- await loadAboutMe();
- await loadDefaultModel();
- } catch {
- setError('Ollama is not running.\nStart Ollama and try again.');
- }
- })();
+// ============================================
+// Subscribe once; read current values through refs
+// ============================================
+useEffect(() => {
+  let unsubToken;
+  let unsubDone;
+  let unsubError;
+  let unsubRAGDone;
+  let unsubRAGError;
 
-  unsubToken = onToken(({ requestId, token, filePath }) => {
+  unsubToken = onToken(({ requestId, token }) => {
   if (requestId !== currentRequestIdRef.current) return;
   if (assistantMessageIdRef.current === null) {
- assistantMessageIdRef.current = crypto.randomUUID();
- assistantContentRef.current = '';
- addMessage({
- id: assistantMessageIdRef.current,
- role: 'assistant',
- content: '',
- });
- }
- const assistantId = assistantMessageIdRef.current;
- assistantContentRef.current += token;
- if (filePath) {
- fileReadChainRef.current = fileReadChainRef.current
- .then(async () => {
- const content = await chatReadFile(filePath);
- if (!assistantId || assistantMessageIdRef.current !== assistantId) return;
- useConversationStore.setState((state) => ({
- messages: state.messages.map((message) =>
- message.id === assistantId ? { ...message, content } : message
- ),
- }));
- })
- .catch((err) => {
- setError('Failed to read the temporary Markdown response: ' + err.message);
- });
- } else {
- appendToken(token);
- }
- });
+  assistantMessageIdRef.current = crypto.randomUUID();
+  assistantContentRef.current = '';
+  addMessage({
+  id: assistantMessageIdRef.current,
+  role: 'assistant',
+  content: '',
+  });
+  }
+  const assistantId = assistantMessageIdRef.current;
+  assistantContentRef.current += token;
+  if (pendingTokenFlushRef.current === null) {
+  pendingTokenFlushRef.current = requestAnimationFrame(() => {
+  pendingTokenFlushRef.current = null;
+  if (!assistantId || assistantMessageIdRef.current !== assistantId) return;
+  useConversationStore.setState((state) => ({
+  messages: state.messages.map((message) =>
+  message.id === assistantId ? { ...message, content: assistantContentRef.current } : message
+  ),
+  }));
+  });
+  }
+  });
 
- unsubDone = onDone(({ requestId: doneId }) => {
- if (doneId !== currentRequestIdRef.current) return;
- const conversationId = activeConversationId;
+unsubDone = onDone(({ requestId: doneId }) => {
+  if (doneId !== currentRequestIdRef.current) return;
+  const conversationId = activeConversationIdRef.current;
  if (conversationId && assistantMessageIdRef.current) {
  messageSave({
  id: assistantMessageIdRef.current,
@@ -143,23 +145,34 @@ export function ChatView() {
  createdAt: new Date().toISOString(),
  });
  }
- const completedAssistantId = assistantMessageIdRef.current;
- fileReadChainRef.current.finally(() => {
- if (assistantMessageIdRef.current !== completedAssistantId) return;
- assistantMessageIdRef.current = null;
- assistantContentRef.current = '';
- currentRequestIdRef.current = null;
- finishStream();
- });
+  const completedAssistantId = assistantMessageIdRef.current;
+  if (pendingTokenFlushRef.current !== null) {
+  cancelAnimationFrame(pendingTokenFlushRef.current);
+  pendingTokenFlushRef.current = null;
+  }
+  if (assistantMessageIdRef.current !== completedAssistantId) return;
+  assistantMessageIdRef.current = null;
+  assistantContentRef.current = '';
+  currentRequestIdRef.current = null;
+  finishStream();
  });
 
- unsubError = onError(({ requestId: errId, message }) => {
- if (errId !== currentRequestIdRef.current) return;
- assistantMessageIdRef.current = null;
- assistantContentRef.current = '';
- currentRequestIdRef.current = null;
- setError(message);
- });
+  unsubError = onError(({ requestId: errId, message }) => {
+  if (errId !== currentRequestIdRef.current) return;
+  if (pendingTokenFlushRef.current !== null) {
+  cancelAnimationFrame(pendingTokenFlushRef.current);
+  pendingTokenFlushRef.current = null;
+  }
+  if (assistantMessageIdRef.current) {
+  useConversationStore.setState((state) => ({
+  messages: state.messages.filter((m) => m.id !== assistantMessageIdRef.current),
+  }));
+  }
+  assistantMessageIdRef.current = null;
+  assistantContentRef.current = '';
+  currentRequestIdRef.current = null;
+  setError(message);
+  });
 
  unsubRAGDone = onRAGDone(({ results, query }) => {
  setRAGSources(results);
@@ -169,25 +182,22 @@ export function ChatView() {
  console.error('RAG error:', message);
  });
 
- return () => {
- unsubToken?.();
- unsubDone?.();
- unsubError?.();
- unsubRAGDone?.();
- unsubRAGError?.();
- };
- }, [
- addMessage,
- appendToken,
- messageSave,
- setError,
- finishStream,
- activeConversationId,
- loadModes,
- loadAboutMe,
- loadDefaultModel,
- chatReadFile,
- ]);
+  return () => {
+  if (pendingTokenFlushRef.current !== null) {
+  cancelAnimationFrame(pendingTokenFlushRef.current);
+  }
+  unsubToken?.();
+  unsubDone?.();
+  unsubError?.();
+  unsubRAGDone?.();
+  unsubRAGError?.();
+  };
+  }, [
+  addMessage,
+  messageSave,
+  setError,
+  finishStream,
+  ]);
 
   const resolveModel = useCallback(() => {
   const mode = activeModeId ? getMode(activeModeId) : null;
@@ -205,7 +215,6 @@ export function ChatView() {
  }
   const requestId = crypto.randomUUID();
   currentRequestIdRef.current = requestId;
-  fileReadChainRef.current = Promise.resolve();
   startStream(requestId);
   try {
   await chatStart({

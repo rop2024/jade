@@ -4,6 +4,8 @@ import { ChatView } from '../components/chat/ChatView';
 import { ModePicker } from '../components/modes/ModePicker';
 import { SaveToVaultDialog } from '../components/chat/SaveToVaultDialog';
 import { ProcessingProgress } from '../components/files/ProcessingProgress';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { OllamaStatusBar } from '../components/OllamaStatusBar';
 import {
  chatStart,
  onToken,
@@ -274,11 +276,12 @@ export function ChatPage() {
  </aside>
  <div className="flex-1 flex flex-col min-w-0">
  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
- <div>
- <h1 className="text-3xl font-display font-bold tracking-tight">
- {activeConversationId ? 'Chat' : 'New Chat'}
- </h1>
- </div>
+  <div>
+  <h1 className="text-3xl font-display font-bold tracking-tight">
+  {activeConversationId ? 'Chat' : 'New Chat'}
+  </h1>
+  </div>
+  <OllamaStatusBar />
  <div className="flex items-center gap-2">
  <ModePicker />
  <button
@@ -315,7 +318,9 @@ export function ChatPage() {
  </div>
  </div>
  <div className="flex-1 surface-2 border border-line panel flex flex-col overflow-hidden shadow-neon-cyan">
- <ChatView />
+ <ErrorBoundary>
+  <ChatView />
+</ErrorBoundary>
  </div>
  </div>
  </div>

@@ -221,6 +221,31 @@ contextBridge.exposeInMainWorld('api', {
     lockRequireUnlock: (password) => ipcRenderer.invoke('lock:requireUnlock', { password }),
 
     ollamaOpenInstallLink: () => ipcRenderer.invoke('ollama:openInstallLink'),
+
+    // ============================================
+    // Feedback examples
+    // ============================================
+    addFeedbackExample: (modeId, example) =>
+        ipcRenderer.invoke('feedback:addExample', { modeId, example }),
+
+    // ============================================
+    // Document processing
+    // ============================================
+    documentProcess: (payload) => ipcRenderer.invoke('document:process', payload),
+    documentCancel: (payload) => ipcRenderer.send('document:cancel', payload),
+
+    // ============================================
+    // Batch processing
+    // ============================================
+    batchProcess: (payload) => ipcRenderer.invoke('batch:process', payload),
+    batchCancel: (payload) => ipcRenderer.send('batch:cancel', payload),
+
+    // ============================================
+    // Folder watch
+    // ============================================
+    watchStart: (payload) => ipcRenderer.invoke('watch:start', payload),
+    watchStop: (payload) => ipcRenderer.invoke('watch:stop', payload),
+    watchApprove: (payload) => ipcRenderer.invoke('watch:approve', payload),
 });
 
 console.log('Preload script loaded successfully - chat API exposed');

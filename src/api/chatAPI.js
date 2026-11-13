@@ -110,9 +110,7 @@ function getApi() {
 }
 
 function stub() {
-    return () => {
-        throw new Error(NOT_IN_ELECTRON);
-    };
+    return () => {};
 }
 
 function stubPromise() {
@@ -934,6 +932,18 @@ export async function ollamaStart() {
     return a.ollamaStart();
 }
 
+/**
+ * Save a feedback example for a mode.
+ * @param {string} modeId
+ * @param {{input:string, output:string, correctedOutput?:string}} example
+ * @returns {Promise<Object|null>}
+ */
+export async function addFeedbackExample(modeId, example) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.addFeedbackExample({ modeId, example });
+}
+
 /* ============================================
  * Settings
  * ============================================ */
@@ -1050,6 +1060,7 @@ export default {
     lockRequireUnlock,
     ollamaOpenInstallLink,
     ollamaStart,
+    addFeedbackExample,
     settingsGetAll,
     settingGet,
     settingSet,

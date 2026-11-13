@@ -129,9 +129,11 @@ async function streamChat({ model, messages, signal, onToken, options }) {
     let tokenCount = 0;
     debugOllama(`request started model=${model} messages=${messages.length}`);
 
+    const requestOptions = { num_ctx: 8192, ...options };
+
     const response = await http.post(
         '/api/chat',
-        { model, messages, stream: true, options },
+        { model, messages, stream: true, options: requestOptions },
         { signal, responseType: 'stream' },
     );
     debugOllama(`stream connected model=${model}`);
@@ -188,10 +190,28 @@ async function streamChat({ model, messages, signal, onToken, options }) {
     });
 }
 
+async function readStreamBody(stream) {
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+        stream.on('error', reject);
+    });
+}
+
 async function chat({ model, messages, signal, onToken, onDone, onError, systemPrompt, options }) {
     try {
-        const finalMessages = systemPrompt
-            ? trimMessages(messages, systemPrompt)
+        // Always trim to the context budget. For mode chats the system prompt
+        // is already embedded in messages by buildMessages; extract it if we
+        // weren't given one explicitly.
+        let sysPrompt = systemPrompt;
+        if (!sysPrompt && messages.length) {
+            const first = messages[0];
+            if (first.role === 'system') sysPrompt = first.content;
+        }
+
+        const finalMessages = sysPrompt
+            ? trimMessages(messages, sysPrompt)
             : messages;
 
         await streamChat({ model, messages: finalMessages, signal, onToken, options });
@@ -212,12 +232,25 @@ async function chat({ model, messages, signal, onToken, onDone, onError, systemP
             code = `http_${status}`;
             if (status === 404) {
                 message = `The model "${model}" is not installed. Pull it first (e.g. \`ollama pull ${model}\`).`;
+            } else if (typeof body === 'string') {
+                try {
+                    const parsed = JSON.parse(body);
+                    message = parsed.error || `Ollama returned status ${status}`;
+                } catch {
+                    message = body || `Ollama returned status ${status}`;
+                }
             } else {
                 message = body.error || `Ollama returned status ${status}`;
             }
-        } else if (err.code === 'ECONNREFUSED' || !err.response) {
+        } else if (err.code === 'ECONNREFUSED') {
             code = 'connection';
             message = 'Ollama is not running. Start Ollama and try again.';
+        } else if (err.code === 'ETIMEDOUT' || err.code === 'ECONNABORTED') {
+            code = 'timeout';
+            message = 'Ollama request timed out.';
+        } else {
+            code = 'network';
+            message = `Failed to reach Ollama: ${err.message}`;
         }
 
         debugOllama(`request failed model=${model} code=${code}: ${message}`);

@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { loadModes, loadMode, saveMode, deleteMode } = require('../services/modes');
+const { loadModes, loadMode, saveMode, deleteMode, addFeedbackExample } = require('../services/modes');
 
 function registerModesIpcHandlers() {
     // ============================================
@@ -12,6 +12,12 @@ function registerModesIpcHandlers() {
     ipcMain.handle('mode:save', (event, { mode }) => saveMode(mode));
 
     ipcMain.handle('mode:delete', (event, { id }) => deleteMode(id));
+
+    // ============================================
+    // Feedback examples
+    // ============================================
+    ipcMain.handle('feedback:addExample', (event, { modeId, example }) =>
+        addFeedbackExample(modeId, example));
 }
 
 module.exports = { registerModesIpcHandlers };

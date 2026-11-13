@@ -1,7 +1,4 @@
 const { ipcMain } = require('electron');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
 const { randomUUID } = require('crypto');
 const { chat, generateTitle, isOllamaRunning, listModels, startOllama } = require('../services/ollama');
 const { getDatabase } = require('../services/db');
@@ -13,8 +10,6 @@ const { getAboutMe, buildMessages } = require('../services/context');
  * @type {Map<string, AbortController>}
  */
 const activeControllers = new Map();
-const responseDirectory = path.join(os.tmpdir(), 'jade-chat-responses');
-const RESPONSE_CLEANUP_DELAY = 60 * 1000;
 
 let nextRequestId = 1;
 const DEBUG_CHAT =
@@ -22,30 +17,6 @@ const DEBUG_CHAT =
 
 function debugChat(message) {
     if (DEBUG_CHAT) console.log(`[Chat] ${message}`);
-}
-
-function createResponseFile(requestId) {
-    fs.mkdirSync(responseDirectory, { recursive: true });
-    const filePath = path.join(responseDirectory, `${requestId}-${randomUUID()}.md`);
-    fs.writeFileSync(filePath, '', 'utf8');
-    return filePath;
-}
-
-function scheduleResponseCleanup(filePath) {
-    setTimeout(() => {
-        try {
-            fs.unlinkSync(filePath);
-        } catch (err) {
-            if (err.code !== 'ENOENT') {
-                debugChat(`failed to clean response file ${filePath}: ${err.message}`);
-            }
-        }
-    }, RESPONSE_CLEANUP_DELAY).unref();
-}
-
-function isResponseFile(filePath) {
-    const directory = path.resolve(responseDirectory) + path.sep;
-    return typeof filePath === 'string' && path.resolve(filePath).startsWith(directory);
 }
 
 function generateRequestId() {
@@ -71,7 +42,6 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
     }) => {
         const requestId = rid || generateRequestId();
         const controller = new AbortController();
-        const responseFile = createResponseFile(requestId);
         activeControllers.set(requestId, controller);
         debugChat(`started request=${requestId} model=${model}`);
 
@@ -118,19 +88,17 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
                     options,
                     onToken: (token) => {
                         try {
-                            fs.appendFileSync(responseFile, token, 'utf8');
                             send(getMainWindow(), 'chat:token', {
                                 requestId,
                                 token,
-                                filePath: responseFile,
                             });
                         } catch (err) {
-                            debugChat(`failed to write response file: ${err.message}`);
+                            debugChat(`failed to send token: ${err.message}`);
                             controller.abort();
                             send(getMainWindow(), 'chat:error', {
                                 requestId,
-                                message: 'Failed to write the temporary Markdown response.',
-                                code: 'response_file',
+                                message: 'Failed to stream token.',
+                                code: 'stream_send',
                             });
                             cleanup();
                         }
@@ -139,9 +107,7 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
                         debugChat(`completed request=${requestId}`);
                         send(getMainWindow(), 'chat:done', {
                             requestId,
-                            filePath: responseFile,
                         });
-                        scheduleResponseCleanup(responseFile);
                         // Auto-title a brand-new conversation after the first
                         // assistant response completes.
                         if (conversationId && !titleResolved) {
@@ -161,12 +127,10 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
                             message: err.message,
                             code: err.code,
                         });
-                        scheduleResponseCleanup(responseFile);
                         cleanup();
                     },
                 });
                 if (result.aborted) {
-                    scheduleResponseCleanup(responseFile);
                     cleanup();
                 }
             } catch (err) {
@@ -176,7 +140,6 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
                         message: err.message || 'Unknown Ollama error',
                         code: 'unknown',
                     });
-                    scheduleResponseCleanup(responseFile);
                     cleanup();
                 }
             }
@@ -198,13 +161,6 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
             controller.abort();
             activeControllers.delete(requestId);
         }
-    });
-
-    ipcMain.handle('chat:readFile', async (event, filePath) => {
-        if (!isResponseFile(filePath)) {
-            throw new Error('Invalid chat response file.');
-        }
-        return fs.promises.readFile(filePath, 'utf8');
     });
 
     ipcMain.handle('ollama:status', async () => {

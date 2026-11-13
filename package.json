@@ -5,6 +5,7 @@
   "main": "electron/main/main.js",
   "scripts": {
     "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run dev:react\" \"npm run dev:electron\"",
     "dev:react": "vite",
     "dev:electron": "cross-env NODE_ENV=development wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .",
