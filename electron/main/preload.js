@@ -13,12 +13,12 @@ contextBridge.exposeInMainWorld('api', {
     // Event subscriptions (each returns an unsubscribe function)
     // ============================================
     onToken: (callback) => {
-        const handler = (_event, payload) => callback(payload.token);
+        const handler = (_event, payload) => callback(payload);
         ipcRenderer.on('chat:token', handler);
         return () => ipcRenderer.removeListener('chat:token', handler);
     },
     onDone: (callback) => {
-        const handler = (_event, payload) => callback(payload.requestId);
+        const handler = (_event, payload) => callback(payload);
         ipcRenderer.on('chat:done', handler);
         return () => ipcRenderer.removeListener('chat:done', handler);
     },
