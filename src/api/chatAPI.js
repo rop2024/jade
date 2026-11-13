@@ -912,6 +912,16 @@ export async function ollamaOpenInstallLink() {
     return a.ollamaOpenInstallLink();
 }
 
+/**
+ * Start Ollama if it is not already running.
+ * @returns {Promise<{started:boolean,available:boolean,error?:string}>}
+ */
+export async function ollamaStart() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ollamaStart();
+}
+
 /* ============================================
  * Settings
  * ============================================ */
@@ -1020,6 +1030,7 @@ export default {
     lockCheck,
     lockRequireUnlock,
     ollamaOpenInstallLink,
+    ollamaStart,
     settingGet,
     settingSet,
     isElectron,

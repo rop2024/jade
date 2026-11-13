@@ -207,6 +207,7 @@ contextBridge.exposeInMainWorld('api', {
 
     ollamaWarmUp: (model) => ipcRenderer.invoke('ollama:warmUp', { model }),
     ollamaCheckAvailable: () => ipcRenderer.invoke('ollama:checkAvailable'),
+    ollamaStart: () => ipcRenderer.invoke('ollama:start'),
 
     backupCreate: (outputPath) => ipcRenderer.invoke('backup:create', { outputPath }),
     backupRestore: (zipPath) => ipcRenderer.invoke('backup:restore', { zipPath }),

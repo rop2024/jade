@@ -1,4 +1,6 @@
 const axios = require('axios');
+const { spawn } = require('child_process');
+const path = require('path');
 
 const OLLAMA_BASE_URL = 'http://127.0.0.1:11434';
 
@@ -52,6 +54,47 @@ function trimMessages(messages, systemPrompt, maxTokens = CONTEXT_TOKEN_BUDGET) 
     }
 
     return [{ role: 'system', content: systemPrompt }, ...kept];
+}
+
+let ollamaServeProcess = null;
+
+/**
+ * Start Ollama by spawning `ollama serve` if it is not already running.
+ * @returns {Promise<{started: boolean, available: boolean, error?: string}>}
+ */
+async function startOllama() {
+    if (await isOllamaRunning()) {
+        return { started: false, available: true };
+    }
+
+    if (ollamaServeProcess && !ollamaServeProcess.killed) {
+        return { started: false, available: false, error: 'Ollama start process already running.' };
+    }
+
+    return new Promise((resolve) => {
+        const ollamaPath = process.platform === 'win32' ? 'ollama.cmd' : 'ollama';
+        const child = spawn(ollamaPath, ['serve'], {
+            detached: true,
+            stdio: 'ignore',
+        });
+
+        ollamaServeProcess = child;
+        child.unref();
+
+        // Poll briefly to see if Ollama becomes available.
+        let attempts = 0;
+        const maxAttempts = 30;
+        const interval = setInterval(async () => {
+            attempts += 1;
+            if (await isOllamaRunning()) {
+                clearInterval(interval);
+                resolve({ started: true, available: true });
+            } else if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                resolve({ started: false, available: false, error: 'Ollama did not become available in time.' });
+            }
+        }, 1000);
+    });
 }
 
 async function isOllamaRunning() {
@@ -176,6 +219,7 @@ module.exports = {
     estimateTokens,
     trimMessages,
     isOllamaRunning,
+    startOllama,
     listModels,
     streamChat,
     chat,

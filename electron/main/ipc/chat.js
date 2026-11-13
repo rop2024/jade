@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron');
-const { chat, generateTitle, isOllamaRunning, listModels } = require('../services/ollama');
+const { chat, generateTitle, isOllamaRunning, listModels, startOllama } = require('../services/ollama');
 const { getDatabase } = require('../services/db');
 const { loadMode } = require('../services/modes');
 const { getAboutMe, buildMessages } = require('../services/context');
@@ -139,6 +139,10 @@ function registerChatIpcHandlers(mainWindow) {
             }
         }
         return { available, models };
+    });
+
+    ipcMain.handle('ollama:start', async () => {
+        return await startOllama();
     });
 }
 
