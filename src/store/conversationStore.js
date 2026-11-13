@@ -77,6 +77,7 @@ import {
     lockRequireUnlock,
     ollamaOpenInstallLink,
     addFeedbackExample,
+    ollamaPull,
     settingGet,
     settingSet,
     settingsGetAll,
@@ -147,10 +148,26 @@ export const useConversationStore = create((set, get) => ({
             const settings = await settingsGetAll();
             const defaultModel = settings.defaultModel;
             set({ defaultModel: defaultModel || '' });
+            const savedTheme = settings.theme || 'light';
+            set({ theme: savedTheme });
+            if (typeof document !== 'undefined') {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
             return defaultModel || '';
         } catch {
             return '';
         }
+    },
+
+    theme: 'light',
+    toggleTheme: () => {
+        const { theme } = useConversationStore.getState();
+        const next = theme === 'light' ? 'dark' : 'light';
+        set({ theme: next });
+        if (typeof document !== 'undefined') {
+            document.documentElement.setAttribute('data-theme', next);
+        }
+        settingSet('theme', next);
     },
 
     // ----- Modes -----
@@ -619,6 +636,10 @@ export const useConversationStore = create((set, get) => ({
 
     ollamaCheckAvailable: async () => {
         return await ollamaCheckAvailable();
+    },
+
+    ollamaPull: async (model, onProgress) => {
+        return await ollamaPull(model, onProgress);
     },
 
     backupCreate: async (outputPath) => {

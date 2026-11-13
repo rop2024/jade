@@ -52,11 +52,15 @@
     }
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/source-serif-4": "^5.3.1",
+    "@tailwindcss/typography": "^0.5.20",
     "adm-zip": "^0.6.1",
     "axios": "^1.6.0",
     "better-sqlite3": "^13.0.3",
     "electron-settings": "^4.0.0",
     "gray-matter": "^4.0.3",
+    "lucide-react": "^1.72.0",
     "mammoth": "^1.13.0",
     "pdf-parse": "^2.4.5",
     "react": "^18.2.0",

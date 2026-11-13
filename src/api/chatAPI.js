@@ -944,6 +944,18 @@ export async function addFeedbackExample(modeId, example) {
     return a.addFeedbackExample({ modeId, example });
 }
 
+/**
+ * Pull an Ollama model with progress.
+ * @param {string} model
+ * @param {(progress: any) => void} [onProgress]
+ * @returns {Promise<{success:boolean,model:string}>}
+ */
+export async function ollamaPull(model, onProgress) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.ollamaPull(model);
+}
+
 /* ============================================
  * Settings
  * ============================================ */
@@ -1060,6 +1072,7 @@ export default {
     lockRequireUnlock,
     ollamaOpenInstallLink,
     ollamaStart,
+    ollamaPull,
     addFeedbackExample,
     settingsGetAll,
     settingGet,

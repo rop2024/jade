@@ -279,6 +279,37 @@ async function generateTitle({ model, firstUserMessage, signal }) {
     return title;
 }
 
+async function pullModel({ model, onProgress }) {
+    const response = await http.post(
+        '/api/pull',
+        { model },
+        { signal: null, responseType: 'stream' },
+    );
+    const stream = response.data;
+    return new Promise((resolve, reject) => {
+        let status = '';
+        stream.on('data', (chunk) => {
+            status += chunk.toString();
+            try {
+                const parsed = JSON.parse(status);
+                if (parsed.status) onProgress?.(parsed);
+                if (parsed.status === 'success') {
+                    stream.destroy();
+                    resolve({ success: true, model });
+                }
+                if (parsed.error) {
+                    stream.destroy();
+                    reject(new Error(parsed.error));
+                }
+            } catch {
+                // Incomplete JSON line, keep buffering.
+            }
+        });
+        stream.on('end', () => resolve({ success: true, model }));
+        stream.on('error', (err) => reject(err));
+    });
+}
+
 module.exports = {
     OLLAMA_BASE_URL,
     OllamaError,
@@ -287,6 +318,7 @@ module.exports = {
     isOllamaRunning,
     startOllama,
     listModels,
+    pullModel,
     streamChat,
     chat,
     generateTitle,

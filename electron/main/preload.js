@@ -223,6 +223,11 @@ contextBridge.exposeInMainWorld('api', {
     ollamaOpenInstallLink: () => ipcRenderer.invoke('ollama:openInstallLink'),
 
     // ============================================
+    // Ollama model management
+    // ============================================
+    ollamaPull: (model) => ipcRenderer.invoke('ollama:pull', { model }),
+
+    // ============================================
     // Feedback examples
     // ============================================
     addFeedbackExample: (modeId, example) =>
