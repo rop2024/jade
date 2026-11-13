@@ -7,7 +7,7 @@ function registerRAGIpcHandlers(mainWindow) {
     const rag = getRAGService();
 
     function send(channel, payload) {
-        if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isDevToolsDestroyed()) {
+        if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.webContents.send(channel, payload);
         }
     }

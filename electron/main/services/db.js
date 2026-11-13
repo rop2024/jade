@@ -191,7 +191,7 @@ class ChatDatabase {
 
     updateMessage(id, content) {
         this._stmts.updateMessage.run({ id, content });
-        const row = this._stmts.db.prepare(`SELECT conversation_id FROM messages WHERE id = @id`).get({ id });
+        const row = this.db.prepare(`SELECT conversation_id FROM messages WHERE id = @id`).get({ id });
         if (row) {
             this._stmts.touchConversation.run({ id: row.conversation_id });
         }

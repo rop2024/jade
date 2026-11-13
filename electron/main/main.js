@@ -39,7 +39,7 @@ let loggerService = null;
 let errorHandler = null;
 let eventEmitter = null;
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = !app.isPackaged;
 
 // ============================================
 // App Lifecycle
@@ -158,6 +158,10 @@ app.whenReady().then(async () => {
         // Initialize all services
         const services = await initializeServices();
 
+        // Create main window first so IPC handlers, hotkeys and tray can
+        // reach it. Handlers resolve the window via the getter at event time.
+        createWindow();
+
         // Register IPC handlers
         registerIpcHandlers(ipcMain, {
             mainWindow,
@@ -199,9 +203,6 @@ app.whenReady().then(async () => {
                 console.log('Ollama warm-up not available:', err.message);
             }
         })();
-
-        // Create main window
-        createWindow();
 
         app.on('activate', function () {
             if (BrowserWindow.getAllWindows().length === 0) createWindow();

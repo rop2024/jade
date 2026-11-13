@@ -53,7 +53,7 @@ function generateRequestId() {
 }
 
 function send(mainWindow, channel, payload) {
-    if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isDevToolsDestroyed()) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send(channel, payload);
     }
 }
@@ -66,9 +66,10 @@ function registerChatIpcHandlers(mainWindowOrGetter) {
         : () => mainWindowOrGetter;
 
     ipcMain.handle('chat:start', async (event, {
+        requestId: rid,
         model, messages, conversationId, firstUserMessage, modeId, temperature,
     }) => {
-        const requestId = generateRequestId();
+        const requestId = rid || generateRequestId();
         const controller = new AbortController();
         const responseFile = createResponseFile(requestId);
         activeControllers.set(requestId, controller);

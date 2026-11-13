@@ -89,6 +89,11 @@ async function startOllama() {
         ollamaServeProcess = child;
         child.unref();
 
+        child.on('error', (e) => {
+            ollamaServeProcess = null;
+            resolve({ started: false, available: false, error: e.message });
+        });
+
         // Poll briefly to see if Ollama becomes available.
         let attempts = 0;
         const maxAttempts = 30;

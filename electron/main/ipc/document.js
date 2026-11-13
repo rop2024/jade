@@ -18,7 +18,7 @@ const processingJobs = new Map();
 const folderWatchers = new Map();
 
 function send(mainWindow, channel, payload) {
-    if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isDevToolsDestroyed()) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send(channel, payload);
     }
 }

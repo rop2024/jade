@@ -19,6 +19,8 @@ import { ChatInput } from './ChatInput';
 import { SaveToVaultDialog } from './SaveToVaultDialog';
 import { AttachFileDialog } from '../files/AttachFileDialog';
 
+const EMBED = /embed|nomic|bge|minilm/i;
+
 export function ChatView() {
  const {
  messages,
@@ -97,9 +99,9 @@ export function ChatView() {
  }
  })();
 
- unsubToken = onToken(({ requestId, token, filePath }) => {
- currentRequestIdRef.current = requestId;
- if (assistantMessageIdRef.current === null) {
+  unsubToken = onToken(({ requestId, token, filePath }) => {
+  if (requestId !== currentRequestIdRef.current) return;
+  if (assistantMessageIdRef.current === null) {
  assistantMessageIdRef.current = crypto.randomUUID();
  assistantContentRef.current = '';
  addMessage({
@@ -187,10 +189,11 @@ export function ChatView() {
  chatReadFile,
  ]);
 
- const resolveModel = useCallback(() => {
- const mode = activeModeId ? getMode(activeModeId) : null;
- return (mode && mode.model) || defaultModel || models[0]?.name || '';
- }, [activeModeId, defaultModel, getMode, models]);
+  const resolveModel = useCallback(() => {
+  const mode = activeModeId ? getMode(activeModeId) : null;
+  return mode?.model || useConversationStore.getState().getSelectedModel()
+      || defaultModel || models.find(m => !EMBED.test(m.name))?.name || '';
+  }, [activeModeId, defaultModel, getMode, models]);
 
  const sendMessages = useCallback(async (conversationId, sendMessages, modeId) => {
  const mode = modeId ? getMode(modeId) : null;
@@ -200,17 +203,24 @@ export function ChatView() {
  if (!model) {
  throw new Error('No Ollama model is configured or installed.');
  }
- const { requestId: newId } = await chatStart({
- model,
- conversationId,
- firstUserMessage,
- modeId,
- messages: sendMessages,
- });
- fileReadChainRef.current = Promise.resolve();
- startStream(newId);
- currentRequestIdRef.current = newId;
- }, [input, resolveModel, getMode, startStream]);
+  const requestId = crypto.randomUUID();
+  currentRequestIdRef.current = requestId;
+  fileReadChainRef.current = Promise.resolve();
+  startStream(requestId);
+  try {
+  await chatStart({
+  requestId,
+  model,
+  conversationId,
+  firstUserMessage,
+  modeId,
+  messages: sendMessages,
+  });
+  } catch (e) {
+  currentRequestIdRef.current = null;
+  throw e;
+  }
+  }, [input, resolveModel, getMode, startStream]);
 
  const handleSend = useCallback(async () => {
  if (!input.trim()) return;

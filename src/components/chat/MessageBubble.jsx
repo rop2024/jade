@@ -19,9 +19,9 @@ export function MessageBubble({ message, onCopy, onRegenerate, onEdit, onSaveToV
  : 'border border-line surface-2 '
  }`}
  >
- {isAssistant ? (
- <ReactMarkdown className="prose prose-sm text-text" children={message.content} />
- ) : (
+  {isAssistant ? (
+  <div className="prose"><ReactMarkdown>{message.content}</ReactMarkdown></div>
+  ) : (
  message.content
  )}
  <MessageActions

@@ -1,8 +1,9 @@
 const { ipcMain } = require('electron');
+const crypto = require('crypto');
 const { getDatabase } = require('../services/db');
 
 function send(mainWindow, channel, payload) {
-    if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isDevToolsDestroyed()) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send(channel, payload);
     }
 }
@@ -27,7 +28,7 @@ function registerConversationIpcHandlers(mainWindow) {
         db.deleteConversation(id));
 
     ipcMain.handle('conversation:setMode', (event, { id, modeId }) => {
-        const stmt = db._stmts.db.prepare(
+        const stmt = db.db.prepare(
             `UPDATE conversations SET mode_id = @mode_id, updated_at = CURRENT_TIMESTAMP WHERE id = @id`
         );
         const result = stmt.run({ id, mode_id: modeId });
@@ -47,8 +48,8 @@ function registerConversationIpcHandlers(mainWindow) {
         db.updateMessage(id, content));
 
     ipcMain.handle('message:delete', (event, { id }) => {
-        const msg = db._stmts.db.prepare(`SELECT conversation_id FROM messages WHERE id = @id`).get({ id });
-        const stmt = db._stmts.db.prepare(`DELETE FROM messages WHERE id = @id`);
+        const msg = db.db.prepare(`SELECT conversation_id FROM messages WHERE id = @id`).get({ id });
+        const stmt = db.db.prepare(`DELETE FROM messages WHERE id = @id`);
         const result = stmt.run({ id });
         if (msg) {
             db._stmts.touchConversation.run({ id: msg.conversation_id });
