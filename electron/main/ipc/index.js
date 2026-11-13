@@ -14,6 +14,7 @@ const { registerRAGIpcHandlers } = require('./rag');
 
 function registerIpcHandlers(ipcMain, {
     mainWindow,
+    getMainWindow,
     settingsService,
     databaseService,
     api,
@@ -114,7 +115,7 @@ function registerIpcHandlers(ipcMain, {
     // ============================================
     // Chat Handlers (Ollama)
     // ============================================
-    registerChatIpcHandlers(mainWindow);
+    registerChatIpcHandlers(getMainWindow || (() => mainWindow));
 
     // ============================================
     // Conversation Handlers (SQLite)

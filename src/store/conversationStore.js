@@ -71,6 +71,7 @@ import {
     ollamaOpenInstallLink,
     settingGet,
     settingSet,
+    settingsGetAll,
     isElectron,
 } from '../api/chatAPI';
 
@@ -89,6 +90,7 @@ export const useConversationStore = create((set, get) => ({
     models: [],
     modelPresets: { fast: null, deep: null },
     selectedModelKey: 'fast',
+    defaultModel: '',
 
     loadModels: async () => {
         try {
@@ -129,6 +131,17 @@ export const useConversationStore = create((set, get) => ({
             return { fast, deep };
         } catch {
             return { fast: null, deep: null };
+        }
+    },
+
+    loadDefaultModel: async () => {
+        try {
+            const settings = await settingsGetAll();
+            const defaultModel = settings.defaultModel;
+            set({ defaultModel: defaultModel || '' });
+            return defaultModel || '';
+        } catch {
+            return '';
         }
     },
 
@@ -293,6 +306,10 @@ export const useConversationStore = create((set, get) => ({
 
     addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
+
+    messageSave: async (payload) => {
+        return await messageSave(payload);
+    },
 
     replaceLastMessage: (message) =>
         set((state) => {

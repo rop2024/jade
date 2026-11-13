@@ -161,6 +161,7 @@ app.whenReady().then(async () => {
         // Register IPC handlers
         registerIpcHandlers(ipcMain, {
             mainWindow,
+            getMainWindow: () => mainWindow,
             settingsService: services.settingsService,
             databaseService: services.databaseService,
             api: services.apiClient,

@@ -10,6 +10,7 @@ const NOT_IN_ELECTRON = 'This feature requires the desktop app (not a browser).'
  * @typedef {Object} ChatTokenPayload
  * @property {string} requestId
  * @property {string} token
+ * @property {string} [filePath]
  */
 
 /**
@@ -143,6 +144,17 @@ export function chatStop(requestId) {
     const a = getApi();
     if (!a) throw new Error(NOT_IN_ELECTRON);
     a.chatStop(requestId);
+}
+
+/**
+ * Read the temporary Markdown response backing a live chat stream.
+ * @param {string} filePath
+ * @returns {Promise<string>}
+ */
+export async function chatReadFile(filePath) {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.chatReadFile(filePath);
 }
 
 /**
@@ -926,6 +938,13 @@ export async function ollamaStart() {
  * Settings
  * ============================================ */
 
+/** @returns {Promise<Object>} */
+export async function settingsGetAll() {
+    const a = getApi();
+    if (!a) throw new Error(NOT_IN_ELECTRON);
+    return a.getSettings();
+}
+
 /** @param {string} key @returns {Promise<string|null>} */
 export async function settingGet(key) {
     const a = getApi();
@@ -1031,6 +1050,7 @@ export default {
     lockRequireUnlock,
     ollamaOpenInstallLink,
     ollamaStart,
+    settingsGetAll,
     settingGet,
     settingSet,
     isElectron,

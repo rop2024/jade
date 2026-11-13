@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('api', {
     // ============================================
     chatStart: (payload) => ipcRenderer.invoke('chat:start', payload),
     chatStop: (requestId) => ipcRenderer.send('chat:stop', { requestId }),
+    chatReadFile: (filePath) => ipcRenderer.invoke('chat:readFile', filePath),
 
     // ============================================
     // Event subscriptions (each returns an unsubscribe function)

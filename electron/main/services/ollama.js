@@ -3,6 +3,8 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 const OLLAMA_BASE_URL = 'http://127.0.0.1:11434';
+const DEBUG_OLLAMA =
+    process.env.NODE_ENV === 'development' || process.env.JADE_DEBUG_OLLAMA === '1';
 
 // Approximate token budget: ~1 token per 4 characters. Target roughly
 // 6,000 tokens of history+system inside an 8,192-token context window.
@@ -24,6 +26,12 @@ const http = axios.create({
     timeout: 0,
     headers: { 'Content-Type': 'application/json' },
 });
+
+function debugOllama(message, ...details) {
+    if (DEBUG_OLLAMA) {
+        console.log(`[Ollama] ${message}`, ...details);
+    }
+}
 
 function estimateTokens(text) {
     return Math.ceil((text || '').length / TOKENS_PER_CHAR);
@@ -112,13 +120,19 @@ async function listModels() {
 }
 
 async function streamChat({ model, messages, signal, onToken, options }) {
+    const startedAt = Date.now();
+    let tokenCount = 0;
+    debugOllama(`request started model=${model} messages=${messages.length}`);
+
     const response = await http.post(
         '/api/chat',
         { model, messages, stream: true, options },
         { signal, responseType: 'stream' },
     );
+    debugOllama(`stream connected model=${model}`);
 
     let buffer = '';
+    let receivedDone = false;
     const stream = response.data;
 
     stream.on('data', (chunk) => {
@@ -131,20 +145,32 @@ async function streamChat({ model, messages, signal, onToken, options }) {
             try {
                 const parsed = JSON.parse(line);
                 if (parsed.message && typeof parsed.message.content === 'string') {
+                    tokenCount += 1;
+                    debugOllama('output:', parsed.message.content);
                     onToken(parsed.message.content);
                 }
                 if (parsed.done) {
-                    stream.destroy();
+                    receivedDone = true;
+                    debugOllama(
+                        `request finished model=${model} tokens=${tokenCount} durationMs=${Date.now() - startedAt}`,
+                    );
                 }
-            } catch {
-                // Ignore malformed JSON lines.
+            } catch (err) {
+                debugOllama('ignored malformed stream output:', line, err.message);
             }
         }
     });
 
     await new Promise((resolve, reject) => {
         stream.on('end', resolve);
+        stream.on('close', () => {
+            if (receivedDone) {
+                debugOllama(`stream closed after completion model=${model}`);
+                resolve();
+            }
+        });
         stream.on('error', (err) => {
+            debugOllama(`stream error model=${model}: ${err.message}`);
             if (err.name === 'AbortError') {
                 reject(err);
             } else {
@@ -168,6 +194,7 @@ async function chat({ model, messages, signal, onToken, onDone, onError, systemP
         return { done: true, aborted: false };
     } catch (err) {
         if (err.name === 'AbortError' || signal.aborted) {
+            debugOllama(`request aborted model=${model}`);
             return { done: false, aborted: true };
         }
 
@@ -188,6 +215,7 @@ async function chat({ model, messages, signal, onToken, onDone, onError, systemP
             message = 'Ollama is not running. Start Ollama and try again.';
         }
 
+        debugOllama(`request failed model=${model} code=${code}: ${message}`);
         onError(new OllamaError(message, code));
         return { done: false, aborted: false, error: new OllamaError(message, code) };
     }

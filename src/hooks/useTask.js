@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { electronAPI } from '../api/electronAPI';
+import { electronAPI, isElectron } from '../api/electronAPI';
 
 /**
  * React hook for core task operations.
@@ -10,13 +10,19 @@ export function useTask() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (!isElectron || typeof window.api.onProgress !== 'function') return undefined;
         const handleProgress = (data) => {
             setProgress(data);
             setIsRunning(data.isRunning || false);
             if (data.status === 'error') setError(data.message);
         };
-        electronAPI.onProgress(handleProgress);
-        return () => electronAPI.removeProgressListener();
+        const unsubscribe = window.api.onProgress(handleProgress);
+        return () => {
+            if (typeof unsubscribe === 'function') unsubscribe();
+            else if (typeof window.api.removeProgressListener === 'function') {
+                window.api.removeProgressListener();
+            }
+        };
     }, []);
 
     const run = useCallback(async (payload = {}) => {

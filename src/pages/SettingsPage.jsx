@@ -97,15 +97,25 @@ export function SettingsPage() {
 
  useEffect(() => {
  setAboutMeLocal(aboutMe);
- setWordCount(countWords ? countWords(aboutMe) : 0);
+ let active = true;
+ if (countWords) {
+ countWords(aboutMe).then((count) => {
+  if (active) setWordCount(count);
+ });
+ } else {
+ setWordCount(0);
+ }
+ return () => {
+  active = false;
+ };
  }, [aboutMe, countWords]);
 
  const handleChange = (key, value) => setLocal(prev => ({ ...prev, [key]: value }));
 
- const handleAboutMeChange = (e) => {
+ const handleAboutMeChange = async (e) => {
  const value = e.target.value;
  setAboutMeLocal(value);
- setWordCount(countWords ? countWords(value) : 0);
+ setWordCount(countWords ? await countWords(value) : 0);
  };
 
  const handleSave = async () => {

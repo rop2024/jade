@@ -36,7 +36,7 @@ export function Sidebar() {
  loadConversations();
  }, [loadConversations]);
 
- const filtered = conversations.filter(Boolean).filter((c) =>
+ const filtered = conversations.filter((c) => c && c.id != null).filter((c) =>
   c.title.toLowerCase().includes(searchQuery.toLowerCase())
  );
 

@@ -3,6 +3,7 @@ import { useConversationStore } from '../../store/conversationStore';
 import {
  chatStart,
  chatStop,
+ chatReadFile,
  onToken,
  onDone,
  onError,
@@ -27,6 +28,7 @@ export function ChatView() {
  error,
  activeConversationId,
  activeModeId,
+ models,
  setInput,
  addMessage,
  appendToken,
@@ -58,10 +60,13 @@ export function ChatView() {
  buildRAGPrompt,
  vaultGet,
  addFeedbackExample,
+ defaultModel,
+ loadDefaultModel,
  } = useConversationStore();
 
  const assistantMessageIdRef = useRef(null);
  const assistantContentRef = useRef('');
+ const fileReadChainRef = useRef(Promise.resolve());
  const currentRequestIdRef = useRef(null);
  const [editingId, setEditingId] = useState(null);
  const [editContent, setEditContent] = useState('');
@@ -86,12 +91,13 @@ export function ChatView() {
  }
  await loadModes();
  await loadAboutMe();
+ await loadDefaultModel();
  } catch {
  setError('Ollama is not running.\nStart Ollama and try again.');
  }
  })();
 
- unsubToken = onToken(({ requestId, token }) => {
+ unsubToken = onToken(({ requestId, token, filePath }) => {
  currentRequestIdRef.current = requestId;
  if (assistantMessageIdRef.current === null) {
  assistantMessageIdRef.current = crypto.randomUUID();
@@ -102,8 +108,25 @@ export function ChatView() {
  content: '',
  });
  }
- appendToken(token);
+ const assistantId = assistantMessageIdRef.current;
  assistantContentRef.current += token;
+ if (filePath) {
+ fileReadChainRef.current = fileReadChainRef.current
+ .then(async () => {
+ const content = await chatReadFile(filePath);
+ if (!assistantId || assistantMessageIdRef.current !== assistantId) return;
+ useConversationStore.setState((state) => ({
+ messages: state.messages.map((message) =>
+ message.id === assistantId ? { ...message, content } : message
+ ),
+ }));
+ })
+ .catch((err) => {
+ setError('Failed to read the temporary Markdown response: ' + err.message);
+ });
+ } else {
+ appendToken(token);
+ }
  });
 
  unsubDone = onDone(({ requestId: doneId }) => {
@@ -118,10 +141,14 @@ export function ChatView() {
  createdAt: new Date().toISOString(),
  });
  }
+ const completedAssistantId = assistantMessageIdRef.current;
+ fileReadChainRef.current.finally(() => {
+ if (assistantMessageIdRef.current !== completedAssistantId) return;
  assistantMessageIdRef.current = null;
  assistantContentRef.current = '';
  currentRequestIdRef.current = null;
  finishStream();
+ });
  });
 
  unsubError = onError(({ requestId: errId, message }) => {
@@ -156,24 +183,31 @@ export function ChatView() {
  activeConversationId,
  loadModes,
  loadAboutMe,
+ loadDefaultModel,
+ chatReadFile,
  ]);
 
  const resolveModel = useCallback(() => {
  const mode = activeModeId ? getMode(activeModeId) : null;
- return (mode && mode.model) || 'llama3.2';
- }, [activeModeId, getMode]);
+ return (mode && mode.model) || defaultModel || models[0]?.name || '';
+ }, [activeModeId, defaultModel, getMode, models]);
 
  const sendMessages = useCallback(async (conversationId, sendMessages, modeId) => {
  const mode = modeId ? getMode(modeId) : null;
  const firstUserMessage =
  sendMessages.find((m) => m.role === 'user')?.content || input;
+ const model = (mode && mode.model) || resolveModel();
+ if (!model) {
+ throw new Error('No Ollama model is configured or installed.');
+ }
  const { requestId: newId } = await chatStart({
- model: (mode && mode.model) || resolveModel(),
+ model,
  conversationId,
  firstUserMessage,
  modeId,
  messages: sendMessages,
  });
+ fileReadChainRef.current = Promise.resolve();
  startStream(newId);
  currentRequestIdRef.current = newId;
  }, [input, resolveModel, getMode, startStream]);
@@ -400,7 +434,7 @@ export function ChatView() {
  history: currentMessages,
  });
  const { requestId } = await chatStart({
- model: summaryMode.model || 'llama3.2',
+ model: summaryMode.model || resolveModel(),
  messages: built,
  firstUserMessage: 'Summarise this conversation',
  modeId: 'summary',
@@ -427,7 +461,7 @@ export function ChatView() {
  } catch (err) {
  setError(err.message || 'Failed to summarise conversation.');
  }
- }, [activeConversationId, getMode, aboutMe, contextBuildMessages, chatStart, onToken, onDone, onError, setError]);
+ }, [activeConversationId, getMode, aboutMe, contextBuildMessages, chatStart, onToken, onDone, onError, setError, resolveModel]);
 
  const handleEditSave = useCallback(async (messageId, newContent) => {
  const trimmed = (newContent || '').trim();
